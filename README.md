@@ -6,18 +6,6 @@
 
 SekaiText is a desktop application for browsing, translating, and proofreading Project Sekai: Colorful Stage! story scenarios. It combines a Vue 3 frontend with a Go backend, packaged as a Tauri desktop app.
 
-## Features
-
-- **Story Browser** — Browse stories by type (event, main story, card, festival, etc.), sorted and indexed from the game data CDN
-- **Translation Editor** — Three editing modes (translate / proofread / check) with line-level editing, speaker tracking, and flashback analysis
-- **Diff Comparison** — Side-by-side comparison between translation versions
-- **Speaker Tools** — Speaker count statistics and consistency checking
-- **Voice Playback** — Fetch and play in-game voice clips alongside story text
-- **Flashback Analysis** — Detect and highlight flashback scenes with major clue annotations
-- **Metadata Refresh** — Pull the latest story indices from the CDN
-- **Local Loading** — Load story JSON files from disk for offline work
-- **Custom Title Bar** — Modern window frame with drag regions and window controls, supporting both light and dark themes
-
 ## Tech Stack
 
 | Layer | Technology |
@@ -112,4 +100,6 @@ Current version: **0.1.0** (alpha)
 
 ## License
 
-This project is for educational and fan-translation purposes only. Project Sekai is a trademark of SEGA / Colorful Palette.
+This project is licensed under the [MIT License](LICENSE).
+
+*Project Sekai is a trademark of SEGA / Colorful Palette. This project is for educational and fan-translation purposes only.*
