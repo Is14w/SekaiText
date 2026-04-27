@@ -1,0 +1,38 @@
+{
+  "name": "sekaitext",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/cleanup.mjs 5173 && vite",
+    "dev:go": "node scripts/cleanup.mjs 9800 && cd backend && go run ./cmd/server/ --dir .",
+    "dev:web": "concurrently --names go,vue --prefix-colors yellow,cyan \"npm run dev:go\" \"npm run dev\"",
+    "dev:tauri": "npx tauri dev",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.2.4",
+    "@tanstack/vue-table": "^8.21.3",
+    "@tanstack/vue-virtual": "^3.13.24",
+    "@tauri-apps/api": "^2.10.1",
+    "@vueuse/core": "^14.2.1",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^3.0.4",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^4.2.4",
+    "vue": "^3.5.32",
+    "vue-router": "^5.0.6"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.10.1",
+    "@types/node": "^24.12.2",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/tsconfig": "^0.9.1",
+    "concurrently": "^9.2.1",
+    "typescript": "~6.0.2",
+    "unplugin-auto-import": "^21.0.0",
+    "vite": "^8.0.10",
+    "vue-tsc": "^3.2.7"
+  }
+}

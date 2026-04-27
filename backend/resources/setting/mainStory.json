@@ -1,0 +1,538 @@
+[
+  {
+    "unit": "piapro",
+    "assetName": "piapro-story-chapter",
+    "chapters": [
+      {
+        "title": "秘密の練習",
+        "assetName": "vsleo_01_01"
+      },
+      {
+        "title": "先輩だからできること",
+        "assetName": "vsleo_01_02"
+      },
+      {
+        "title": "意外な一面",
+        "assetName": "vsleo_01_03"
+      },
+      {
+        "title": "キラキラの毎日",
+        "assetName": "vsleo_01_04"
+      },
+      {
+        "title": "全力ライブ！",
+        "assetName": "vsmmj_01_01"
+      },
+      {
+        "title": "元気を出して",
+        "assetName": "vsmmj_01_02"
+      },
+      {
+        "title": "青のステージ",
+        "assetName": "vsmmj_01_03"
+      },
+      {
+        "title": "みんなでライブ！",
+        "assetName": "vsmmj_01_04"
+      },
+      {
+        "title": "メイコの新作メニュー",
+        "assetName": "vsstreet_01_01"
+      },
+      {
+        "title": "大人の味",
+        "assetName": "vsstreet_01_02"
+      },
+      {
+        "title": "仲直りの一歩",
+        "assetName": "vsstreet_01_03"
+      },
+      {
+        "title": "みんなで歌おう！",
+        "assetName": "vsstreet_01_04"
+      },
+      {
+        "title": "着ぐるみワンダーランド",
+        "assetName": "vswonder_01_01"
+      },
+      {
+        "title": "終わるから始まるもの",
+        "assetName": "vswonder_01_02"
+      },
+      {
+        "title": "君が笑顔になるショーを",
+        "assetName": "vswonder_01_03"
+      },
+      {
+        "title": "空飛ぶショーステージ！？",
+        "assetName": "vswonder_01_04"
+      },
+      {
+        "title": "最初からあった歌",
+        "assetName": "vsnightcode_01_01"
+      },
+      {
+        "title": "痛そうな音符",
+        "assetName": "vsnightcode_01_02"
+      },
+      {
+        "title": "隣にいるから",
+        "assetName": "vsnightcode_01_03"
+      },
+      {
+        "title": "あなたの音楽",
+        "assetName": "vsnightcode_01_04"
+      }
+    ]
+  },
+  {
+    "unit": "light_sound",
+    "assetName": "light-sound-story-chapter",
+    "chapters": [
+      {
+        "title": "オープニング",
+        "assetName": "leo_01_00"
+      },
+      {
+        "title": "４人目の幼馴染み",
+        "assetName": "leo_01_01"
+      },
+      {
+        "title": "せめて、私は",
+        "assetName": "leo_01_02"
+      },
+      {
+        "title": "ふたりだけだとさびしいね",
+        "assetName": "leo_01_03"
+      },
+      {
+        "title": "教室のセカイ",
+        "assetName": "leo_01_04"
+      },
+      {
+        "title": "バンド、やってみない？",
+        "assetName": "leo_01_05"
+      },
+      {
+        "title": "最初の一歩",
+        "assetName": "leo_01_06"
+      },
+      {
+        "title": "おしえてルカさん！",
+        "assetName": "leo_01_07"
+      },
+      {
+        "title": "見えない星",
+        "assetName": "leo_01_08"
+      },
+      {
+        "title": "３人でセッション！？",
+        "assetName": "leo_01_09"
+      },
+      {
+        "title": "ジャングルジムと流星群",
+        "assetName": "leo_01_10"
+      },
+      {
+        "title": "警告したから",
+        "assetName": "leo_01_11"
+      },
+      {
+        "title": "「誰の味方なの？」",
+        "assetName": "leo_01_12"
+      },
+      {
+        "title": "咲希の決意",
+        "assetName": "leo_01_13"
+      },
+      {
+        "title": "大切だから",
+        "assetName": "leo_01_14"
+      },
+      {
+        "title": "ごまかさないで",
+        "assetName": "leo_01_15"
+      },
+      {
+        "title": "「ずっと一緒に」",
+        "assetName": "leo_01_16"
+      },
+      {
+        "title": "穂波の想い",
+        "assetName": "leo_01_17"
+      },
+      {
+        "title": "４人の星空",
+        "assetName": "leo_01_18"
+      },
+      {
+        "title": "needLe",
+        "assetName": "leo_01_19"
+      },
+      {
+        "title": "Leo/need",
+        "assetName": "leo_01_20"
+      }
+    ]
+  },
+  {
+    "unit": "idol",
+    "assetName": "idol-story-chapter",
+    "chapters": [
+      {
+        "title": "オープニング",
+        "assetName": "mmj_01_00"
+      },
+      {
+        "title": "あこがれのアイドル！",
+        "assetName": "mmj_01_01"
+      },
+      {
+        "title": "はっきりしなさい！",
+        "assetName": "mmj_01_02"
+      },
+      {
+        "title": "がんばればきっと",
+        "assetName": "mmj_01_03"
+      },
+      {
+        "title": "アイドルだからこそ",
+        "assetName": "mmj_01_04"
+      },
+      {
+        "title": "ライブに来てね！",
+        "assetName": "mmj_01_05"
+      },
+      {
+        "title": "ステージのセカイ",
+        "assetName": "mmj_01_06"
+      },
+      {
+        "title": "アイドル達の葛藤",
+        "assetName": "mmj_01_07"
+      },
+      {
+        "title": "聞きたくなかった言葉",
+        "assetName": "mmj_01_08"
+      },
+      {
+        "title": "リンっと元気に！",
+        "assetName": "mmj_01_09"
+      },
+      {
+        "title": "引退",
+        "assetName": "mmj_01_10"
+      },
+      {
+        "title": "いままで、ありがとう",
+        "assetName": "mmj_01_11"
+      },
+      {
+        "title": "アイドルの資格",
+        "assetName": "mmj_01_12"
+      },
+      {
+        "title": "嘘つき",
+        "assetName": "mmj_01_13"
+      },
+      {
+        "title": "届けられるものは",
+        "assetName": "mmj_01_14"
+      },
+      {
+        "title": "近くて遠いステージ",
+        "assetName": "mmj_01_15"
+      },
+      {
+        "title": "青色の景色",
+        "assetName": "mmj_01_16"
+      },
+      {
+        "title": "もう一度あの景色を",
+        "assetName": "mmj_01_17"
+      },
+      {
+        "title": "あの日見た希望",
+        "assetName": "mmj_01_18"
+      },
+      {
+        "title": "アイドル新鋭隊",
+        "assetName": "mmj_01_19"
+      },
+      {
+        "title": "MORE MORE JUMP！",
+        "assetName": "mmj_01_20"
+      }
+    ]
+  },
+  {
+    "unit": "street",
+    "assetName": "street-story-chapter",
+    "chapters": [
+      {
+        "title": "オープニング",
+        "assetName": "street_01_00"
+      },
+      {
+        "title": "落書きだらけのストリート",
+        "assetName": "street_01_01"
+      },
+      {
+        "title": "一番ドキドキする歌",
+        "assetName": "street_01_02"
+      },
+      {
+        "title": "WEEKEND GARAGE",
+        "assetName": "street_01_03"
+      },
+      {
+        "title": "BAD DOGS",
+        "assetName": "street_01_04"
+      },
+      {
+        "title": "ストリートのセカイ",
+        "assetName": "street_01_05"
+      },
+      {
+        "title": "不思議なカフェ",
+        "assetName": "street_01_06"
+      },
+      {
+        "title": "とっておきの練習場所",
+        "assetName": "street_01_07"
+      },
+      {
+        "title": "思ってるって思いたい",
+        "assetName": "street_01_08"
+      },
+      {
+        "title": "初めてのイベント",
+        "assetName": "street_01_09"
+      },
+      {
+        "title": "問われた覚悟",
+        "assetName": "street_01_10"
+      },
+      {
+        "title": "扉を開く勇気を",
+        "assetName": "street_01_11"
+      },
+      {
+        "title": "絶対、逃げない！",
+        "assetName": "street_01_12"
+      },
+      {
+        "title": "Vivids！",
+        "assetName": "street_01_13"
+      },
+      {
+        "title": "本気で言ってんのか",
+        "assetName": "street_01_14"
+      },
+      {
+        "title": "認めてくれたから",
+        "assetName": "street_01_15"
+      },
+      {
+        "title": "３人目",
+        "assetName": "street_01_16"
+      },
+      {
+        "title": "レンとMEIKOととっておき",
+        "assetName": "street_01_17"
+      },
+      {
+        "title": "けじめ",
+        "assetName": "street_01_18"
+      },
+      {
+        "title": "Ready Steady",
+        "assetName": "street_01_19"
+      },
+      {
+        "title": "Vivid BAD SQUAD",
+        "assetName": "street_01_20"
+      }
+    ]
+  },
+  {
+    "unit": "theme_park",
+    "assetName": "theme-park-story-chapter",
+    "chapters": [
+      {
+        "title": "オープニング",
+        "assetName": "wonder_01_00"
+      },
+      {
+        "title": "ようこそワンダーステージへ！",
+        "assetName": "wonder_01_01"
+      },
+      {
+        "title": "未来のスターとわんだほい",
+        "assetName": "wonder_01_02"
+      },
+      {
+        "title": "ワンダーランドのセカイ",
+        "assetName": "wonder_01_03"
+      },
+      {
+        "title": "メンバーを探そう！",
+        "assetName": "wonder_01_04"
+      },
+      {
+        "title": "奇妙な演出家",
+        "assetName": "wonder_01_05"
+      },
+      {
+        "title": "４人目のメンバー？",
+        "assetName": "wonder_01_06"
+      },
+      {
+        "title": "ネネロボ・オンステージ！？",
+        "assetName": "wonder_01_07"
+      },
+      {
+        "title": "結成！ショーユニット！",
+        "assetName": "wonder_01_08"
+      },
+      {
+        "title": "変人、本領発揮",
+        "assetName": "wonder_01_09"
+      },
+      {
+        "title": "KAITOのヒント",
+        "assetName": "wonder_01_10"
+      },
+      {
+        "title": "えむの夢",
+        "assetName": "wonder_01_11"
+      },
+      {
+        "title": "公演スタート！",
+        "assetName": "wonder_01_12"
+      },
+      {
+        "title": "失った笑顔",
+        "assetName": "wonder_01_13"
+      },
+      {
+        "title": "あの日の想い",
+        "assetName": "wonder_01_14"
+      },
+      {
+        "title": "おじいちゃんのステージ",
+        "assetName": "wonder_01_15"
+      },
+      {
+        "title": "絶対に失敗しない方法",
+        "assetName": "wonder_01_16"
+      },
+      {
+        "title": "ひとりぼっちの錬金術師",
+        "assetName": "wonder_01_17"
+      },
+      {
+        "title": "“最高のショー\"の答え",
+        "assetName": "wonder_01_18"
+      },
+      {
+        "title": "セカイはまだ始まってすらいない",
+        "assetName": "wonder_01_19"
+      },
+      {
+        "title": "ワンダーランズ×ショウタイム",
+        "assetName": "wonder_01_20"
+      }
+    ]
+  },
+  {
+    "unit": "school_refusal",
+    "assetName": "school-refusal-story-chapter",
+    "chapters": [
+      {
+        "title": "オープニング",
+        "assetName": "nightcode_01_00"
+      },
+      {
+        "title": "真夜中のサークル",
+        "assetName": "nightcode_01_01"
+      },
+      {
+        "title": "白いミク",
+        "assetName": "nightcode_01_02"
+      },
+      {
+        "title": "OWN",
+        "assetName": "nightcode_01_03"
+      },
+      {
+        "title": "私はいい子",
+        "assetName": "nightcode_01_04"
+      },
+      {
+        "title": "消えた雪",
+        "assetName": "nightcode_01_05"
+      },
+      {
+        "title": "誰もいないセカイ",
+        "assetName": "nightcode_01_06"
+      },
+      {
+        "title": "消えたがってるくせに",
+        "assetName": "nightcode_01_07"
+      },
+      {
+        "title": "凡人の絵",
+        "assetName": "nightcode_01_08"
+      },
+      {
+        "title": "ボクはボクでいたいのに",
+        "assetName": "nightcode_01_09"
+      },
+      {
+        "title": "足りない音",
+        "assetName": "nightcode_01_10"
+      },
+      {
+        "title": "幸せになる音楽を",
+        "assetName": "nightcode_01_11"
+      },
+      {
+        "title": "ただひとつの歌",
+        "assetName": "nightcode_01_12"
+      },
+      {
+        "title": "どこにもいない“私”",
+        "assetName": "nightcode_01_13"
+      },
+      {
+        "title": "寂しいなぁ、って",
+        "assetName": "nightcode_01_14"
+      },
+      {
+        "title": "消えてしまう前に",
+        "assetName": "nightcode_01_15"
+      },
+      {
+        "title": "崩壊",
+        "assetName": "nightcode_01_16"
+      },
+      {
+        "title": "ふたりの呪い",
+        "assetName": "nightcode_01_17"
+      },
+      {
+        "title": "それでも救いたいから",
+        "assetName": "nightcode_01_18"
+      },
+      {
+        "title": "悔やむと書いてミライ",
+        "assetName": "nightcode_01_19"
+      },
+      {
+        "title": "25時、ナイトコードで。",
+        "assetName": "nightcode_01_20"
+      }
+    ]
+  }
+]

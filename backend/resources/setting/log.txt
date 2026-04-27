@@ -1,0 +1,24 @@
+INFO:root:Event Loaded
+INFO:root:Festival Loaded
+INFO:root:Card Loaded
+INFO:root:MainStory Loaded
+INFO:root:Areatalks Loaded
+INFO:root:Greets Loaded
+INFO:root:Specials Loaded
+INFO:root:Setting File Loaded: D:\CodeZone\PRSK_Editor\src\../setting\setting.json
+INFO:root:Text Folder Path: D:\CodeZone\PRSK_Editor\src\../data
+INFO:root:Choose Story 活动剧情 195 悪夢の庭を歌い明かして
+INFO:root:Choose Story 活动剧情 199 Show 'em what's up！
+INFO:root:Force using HarukiNeo
+INFO:root:[ListManager] self.DBurl = https://sekai-master-direct.haruki.seiunx.com/haruki-sekai-master/master/{}.json
+INFO:root:Events Updated
+INFO:root:Cards Updated
+INFO:root:Festivals Updated
+INFO:root:MainStory Loaded
+INFO:root:Areatalks Updated
+INFO:root:Greets Updated
+INFO:root:Specials Updated
+INFO:root:Events Updated with VoiceID Information
+INFO:root:Chapter Information Update Successed.
+INFO:root:Story List Updated
+INFO:root:Choose Story 活动剧情 200 約束のPasserelle
