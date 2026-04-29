@@ -6,6 +6,7 @@ import { useSettingsStore } from '../../stores/settings'
 import { api } from '../../api/client'
 import { useToast } from '../../composables/useToast'
 import { useDebugLog } from '../../composables/useDebugLog'
+import { useDownloadFloat } from '../../composables/useDownloadFloat'
 
 const story = useStoryStore()
 const editor = useEditorStore()
@@ -20,6 +21,7 @@ const displayIndices = computed(() => {
 const refreshing = ref(false)
 const toast = useToast()
 const debug = useDebugLog()
+const dlFloat = useDownloadFloat()
 const fileInput = ref<HTMLInputElement | null>(null)
 
 debug.log('StoryNavigator mounted, fetching types...')
@@ -50,7 +52,7 @@ watch(() => story.selectedType, async (type) => {
   if (!type) return
   story.selectedSort = ''
   story.selectedIndex = ''
-  story.selectedChapter = 0
+  story.selectedChapter = -1
   story.sorts = []
   story.indices = []
   story.chapters = []
@@ -64,7 +66,7 @@ watch(() => story.selectedSort, (sort) => {
   debug.log(`selectedSort changed: "${sort}"`)
   if (!sort || !story.selectedType) return
   story.selectedIndex = ''
-  story.selectedChapter = 0
+  story.selectedChapter = -1
   story.indices = []
   story.chapters = []
   story.fetchIndex(story.selectedType, sort)
@@ -73,7 +75,7 @@ watch(() => story.selectedSort, (sort) => {
 watch(() => story.selectedIndex, (idx) => {
   debug.log(`selectedIndex changed: "${idx}"`)
   if (!idx || !story.selectedType) return
-  story.selectedChapter = 0
+  story.selectedChapter = -1
   story.chapters = []
   if (idx !== '-') {
     story.fetchChapters(story.selectedType, story.selectedSort, idx)
@@ -82,17 +84,22 @@ watch(() => story.selectedIndex, (idx) => {
 
 async function handleRefresh() {
   refreshing.value = true
+  const taskId = dlFloat.add('刷新元数据')
+  dlFloat.start(taskId)
   try {
     await api.update()
     let done = false
     while (!done) {
       await new Promise(r => setTimeout(r, 500))
       const progress = await api.updateProgress()
+      if (progress.total > 0) {
+        dlFloat.progress(taskId, progress.current, progress.total, Math.round((progress.current / progress.total) * 100))
+      }
       done = progress.done
     }
-    toast.show('元数据已刷新', 'success')
+    dlFloat.done(taskId, '元数据已刷新')
   } catch (e: any) {
-    toast.show('刷新失败: ' + (e.message || '未知错误'), 'error')
+    dlFloat.fail(taskId, e.message || '刷新失败')
   } finally {
     refreshing.value = false
   }
@@ -123,6 +130,8 @@ async function handleLocalLoad() {
 }
 async function handleLoad() {
   debug.log(`载入按钮点击 loading=${story.loading} selectedType="${story.selectedType}"`)
+  const taskId = dlFloat.add('载入故事')
+  dlFloat.start(taskId)
   try {
     await story.loadStory()
     if (story.sourceTalks.length > 0) {
@@ -134,13 +143,14 @@ async function handleLoad() {
       })
       editor.setTalks(dstTalks, dstTalks, [])
       editor.majorClue = null
-      toast.show(`已载入 ${story.sourceTalks.length} 行`, 'success')
+      dlFloat.done(taskId, `已载入 ${story.sourceTalks.length} 行`)
     } else {
       debug.log('故事载入返回0行', 'warn')
+      dlFloat.done(taskId, '载入完成（0行）')
     }
   } catch (e: any) {
     debug.log('载入失败: ' + e.message, 'error')
-    toast.show('载入失败: ' + (e.message || '未知错误'), 'error')
+    dlFloat.fail(taskId, e.message || '载入失败')
   }
 }
 </script>
@@ -163,7 +173,7 @@ async function handleLoad() {
     </select>
 
     <select v-model="story.selectedChapter" class="px-2 py-1 rounded border border-[var(--color-border)] bg-[var(--color-surface)] text-sm">
-      <option :value="0" disabled>章节</option>
+      <option :value="-1" disabled>章节</option>
       <option v-for="c in story.chapters" :key="c.number" :value="c.number">{{ c.label }}</option>
     </select>
 
@@ -182,7 +192,7 @@ async function handleLoad() {
       @click="handleLoad"
       class="px-3 py-1 rounded text-white text-sm transition-all hover:brightness-110 disabled:opacity-50"
       style="background-color: var(--color-secondary)"
-      :disabled="story.loading || !story.selectedType"
+      :disabled="story.loading || !story.selectedType || story.selectedChapter < 0"
     >
       {{ story.loading ? '载入中...' : '载入' }}
     </button>

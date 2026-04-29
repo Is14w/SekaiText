@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -15,14 +16,15 @@ import (
 
 // Handler holds shared dependencies for all HTTP handlers.
 type Handler struct {
-	cfg       *config.AppConfig
-	lm        *service.ListManager
-	editor    *service.EditorService
-	jsonLoader *service.JsonLoaderService
-	fb        *service.FlashbackAnalyzer
-	dl        *service.Downloader
-	progress  *service.ProgressTracker
-	logBuf    *service.LogBuffer
+	cfg          *config.AppConfig
+	lm           *service.ListManager
+	editor       *service.EditorService
+	jsonLoader   *service.JsonLoaderService
+	fb           *service.FlashbackAnalyzer
+	dl           *service.Downloader
+	progress     *service.ProgressTracker
+	logBuf       *service.LogBuffer
+	downloadTasks sync.Map // map[string]*model.DownloadTaskProgress
 }
 
 // NewHandler creates a new Handler with all services initialized.
@@ -426,6 +428,69 @@ func (h *Handler) UpdateProgress(w http.ResponseWriter, r *http.Request) {
 		Message: message,
 		Done:    done,
 	})
+}
+
+// --- JSON Download ---
+
+func (h *Handler) DownloadStoryJSON(w http.ResponseWriter, r *http.Request) {
+	var req model.JsonDownloadRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	path := h.lm.GetJsonPath(req.StoryType, req.Sort, req.Index, req.Chapter, req.Source)
+	if path.URL == "" {
+		writeError(w, http.StatusNotFound, "story not found")
+		return
+	}
+
+	outputDir := req.OutputDir
+	if outputDir == "" {
+		outputDir = h.cfg.DataDir + "/json"
+	}
+
+	taskID := strconv.FormatInt(time.Now().UnixNano(), 36)
+	task := &model.DownloadTaskProgress{TaskID: taskID, Status: "downloading"}
+	h.downloadTasks.Store(taskID, task)
+
+	go func() {
+		dlPath, err := h.dl.DownloadJSONToDir(path.URL, outputDir, path.FileName, func(read, total int64) {
+			task.Read = read
+			task.Total = total
+		})
+		if err != nil {
+			task.Status = "error"
+			task.Error = err.Error()
+		} else {
+			task.Status = "done"
+			task.FilePath = dlPath
+		}
+	}()
+
+	writeJSON(w, http.StatusOK, map[string]string{"taskId": taskID})
+}
+
+func (h *Handler) DownloadProgress(w http.ResponseWriter, r *http.Request) {
+	taskID := r.URL.Query().Get("task")
+	if taskID == "" {
+		writeError(w, http.StatusBadRequest, "missing task id")
+		return
+	}
+
+	val, ok := h.downloadTasks.Load(taskID)
+	if !ok {
+		writeError(w, http.StatusNotFound, "task not found")
+		return
+	}
+
+	task := val.(*model.DownloadTaskProgress)
+	writeJSON(w, http.StatusOK, task)
+
+	// Clean up completed tasks after serving
+	if task.Status == "done" || task.Status == "error" {
+		h.downloadTasks.Delete(taskID)
+	}
 }
 
 // --- Assets ---

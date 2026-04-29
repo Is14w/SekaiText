@@ -9,6 +9,8 @@ export interface Settings {
   debugEnabled: boolean
   indexOrder: 'asc' | 'desc'
   voiceOutputDir?: string
+  jsonDownloadDir?: string
+
   lastStoryType?: string
   lastStorySort?: string
   lastStoryIndex?: string

@@ -217,6 +217,25 @@ export const api = {
   updateProgress: () =>
     request<{ current: number; total: number; message?: string; done: boolean }>('/update/progress'),
 
+  // JSON Download
+  downloadJson: (data: {
+    storyType: string
+    sort: string
+    index: string
+    chapter: number
+    source: string
+    outputDir: string
+  }) =>
+    request<{ taskId: string }>('/story/download-json', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  downloadProgress: (taskId: string) =>
+    request<{ taskId: string; status: string; read: number; total: number; filePath?: string; error?: string }>(
+      '/story/download-progress?task=' + encodeURIComponent(taskId),
+    ),
+
   // Assets
   characters: () =>
     request<import('../types/dictionary').CharacterInfo[]>('/assets/characters'),

@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import EditorPage from '../pages/EditorPage.vue'
 import SettingsPage from '../pages/SettingsPage.vue'
 import DebugPage from '../pages/DebugPage.vue'
+import JsonDownloadPage from '../pages/JsonDownloadPage.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -20,6 +21,11 @@ const router = createRouter({
       path: '/debug',
       name: 'debug',
       component: DebugPage,
+    },
+    {
+      path: '/download',
+      name: 'download',
+      component: JsonDownloadPage,
     },
   ],
 })

@@ -8,6 +8,7 @@
     "dev:go": "node scripts/cleanup.mjs 9800 && cd backend && go run ./cmd/server/ --dir .",
     "dev:web": "concurrently --names go,vue --prefix-colors yellow,cyan \"npm run dev:go\" \"npm run dev\"",
     "dev:tauri": "npx tauri dev",
+    "build:tauri": "npx tauri build",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },

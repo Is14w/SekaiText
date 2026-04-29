@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { useEditorStore } from '../stores/editor'
 import { useSettingsStore } from '../stores/settings'
 import { api } from '../api/client'
 import { useToast } from '../composables/useToast'
-import { Minus, Square, X, Minimize } from 'lucide-vue-next'
+import { Minus, Square, X, Minimize, Pencil, Check, CircleDot, ChevronLeft, ChevronRight, Cog, Download, Bug } from 'lucide-vue-next'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import StoryNavigator from '../components/navigation/StoryNavigator.vue'
 import EditorWorkspace from '../components/editor/EditorWorkspace.vue'
 import SpeakerCountDialog from '../components/dialogs/SpeakerCountDialog.vue'
 import SpeakerCheckDialog from '../components/dialogs/SpeakerCheckDialog.vue'
-import SettingsDialog from '../components/dialogs/SettingsDialog.vue'
 
-const router = useRouter()
+
 const app = useAppStore()
 const editor = useEditorStore()
 const settings = useSettingsStore()
@@ -70,18 +68,25 @@ async function closeWin(e: MouseEvent) {
 const showSpeakerCount = ref(false)
 const tauriErr = ref('')
 const showSpeakerCheck = ref(false)
-const showSettings = ref(false)
+
 const sidebarOpen = ref(true)
 
 function setMode(key: number) {
+  editor.switchMode(key as 0 | 1 | 2)
   app.setEditorMode(key as 0 | 1 | 2)
 }
 
 const modes = [
-  { key: 0, label: '翻译', icon: '✏' },
-  { key: 1, label: '校对', icon: '✓' },
-  { key: 2, label: '合意', icon: '◎' },
+  { key: 0, label: '翻译' },
+  { key: 1, label: '校对' },
+  { key: 2, label: '合意' },
 ]
+
+const modeIcons: Record<number, typeof Pencil> = {
+  0: Pencil,
+  1: Check,
+  2: CircleDot,
+}
 
 async function handleOpen() {
   const path = window.prompt('输入翻译文件路径：')
@@ -99,7 +104,7 @@ async function handleOpen() {
 
 async function handleSave() {
   if (editor.talks.length === 0) return
-  let path = editor.currentFilePath
+  let path: string | null = editor.currentFilePath
   if (!path) {
     path = window.prompt('输入保存路径：')
     if (!path) return
@@ -176,7 +181,8 @@ async function handleFullCheck() {
         @click="sidebarOpen = !sidebarOpen"
         class="flex items-center gap-2 h-10 px-3 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors flex-shrink-0"
       >
-        <span class="text-lg flex-shrink-0 w-5 text-center leading-none">{{ sidebarOpen ? '◁' : '▷' }}</span>
+        <ChevronLeft v-if="sidebarOpen" :size="18" />
+        <ChevronRight v-else :size="18" />
         <span v-if="sidebarOpen" class="text-xs font-medium">模式</span>
       </button>
 
@@ -192,7 +198,7 @@ async function handleFullCheck() {
             ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
             : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'"
         >
-          <span class="w-5 text-center flex-shrink-0 text-base leading-none">{{ m.icon }}</span>
+          <component :is="modeIcons[m.key]" :size="18" />
           <span v-if="sidebarOpen" class="whitespace-nowrap">{{ m.label }}</span>
         </button>
       </div>
@@ -201,20 +207,27 @@ async function handleFullCheck() {
 
       <div class="border-t border-[var(--color-border)] p-1.5 space-y-0.5">
         <router-link
+          to="/download"
+          class="flex items-center gap-2.5 h-9 w-full px-2 rounded-lg transition-colors text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
+        >
+          <Download :size="18" />
+          <span v-if="sidebarOpen" class="whitespace-nowrap">下载</span>
+        </router-link>
+        <router-link
           v-if="settings.settings.debugEnabled"
           to="/debug"
           class="flex items-center gap-2.5 h-9 w-full px-2 rounded-lg transition-colors text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
         >
-          <span class="w-5 text-center flex-shrink-0 text-base leading-none">🐛</span>
+          <Bug :size="18" />
           <span v-if="sidebarOpen" class="whitespace-nowrap">调试</span>
         </router-link>
-        <button
-          @click="showSettings = true"
+        <router-link
+          to="/settings"
           class="flex items-center gap-2.5 h-9 w-full px-2 rounded-lg transition-colors text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
         >
-          <span class="w-5 text-center flex-shrink-0 text-base leading-none">⚙</span>
+          <Cog :size="18" />
           <span v-if="sidebarOpen" class="whitespace-nowrap">设置</span>
-        </button>
+        </router-link>
       </div>
     </aside>
 
@@ -258,7 +271,7 @@ async function handleFullCheck() {
 
     <SpeakerCountDialog v-if="showSpeakerCount" @close="showSpeakerCount = false" />
     <SpeakerCheckDialog v-if="showSpeakerCheck" @close="showSpeakerCheck = false" />
-    <SettingsDialog v-if="showSettings" @close="showSettings = false" />
+
   </div>
 </template>
 

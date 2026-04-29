@@ -43,7 +43,7 @@ func NewRouter(cfg *config.AppConfig) http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 		// Debug
 		r.Get("/debug/logs", h.DebugLogs)
-			r.Post("/debug/save", h.DebugSaveLogs)
+		r.Post("/debug/save", h.DebugSaveLogs)
 
 		// Story navigation
 		r.Route("/story", func(r chi.Router) {
@@ -55,6 +55,8 @@ func NewRouter(cfg *config.AppConfig) http.Handler {
 			r.Post("/load", h.StoryLoad)
 			r.Post("/parse-local", h.StoryParseLocal)
 			r.Post("/load-local", h.StoryLoadLocal)
+			r.Post("/download-json", h.DownloadStoryJSON)
+			r.Get("/download-progress", h.DownloadProgress)
 		})
 
 		// Translation file operations

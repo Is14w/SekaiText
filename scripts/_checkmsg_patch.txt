@@ -1,0 +1,83 @@
+// checkText validates text content and returns fixed text, pass/fail, and warning message.
+func (e *EditorService) checkText(speaker, text string) (string, bool, string) {
+	var msg string
+
+	if speaker != "" && speaker != "场景" && speaker != "左上场景" && speaker != "选项" && text == "" {
+		msg = "空行，若不需要改行请点右侧“-”删去本行"
+		return text, false, msg
+	}
+
+	text = strings.TrimSpace(strings.Split(text, "\n")[0])
+	if text == "" {
+		return text, true, ""
+	}
+
+	if speaker == "场景" || speaker == "左上场景" || speaker == "" {
+		return text, true, ""
+	}
+
+	if speaker == "选项" {
+		if !strings.Contains(text, "/") {
+			text += "/"
+		}
+		if strings.HasSuffix(text, "/") {
+			msg = "选项必须用/分隔"
+			return text, false, msg
+		}
+		return text, true, ""
+	}
+
+	// Standard text replacements
+	text = strings.ReplaceAll(text, "…", "...")
+	text = strings.ReplaceAll(text, "(", "（")
+	text = strings.ReplaceAll(text, ")", "）")
+	text = strings.ReplaceAll(text, ",", "，")
+	text = strings.ReplaceAll(text, "?", "？")
+	text = strings.ReplaceAll(text, "!", "！")
+	text = strings.ReplaceAll(text, "~", "～")
+	text = strings.ReplaceAll(text, "欸", "诶")
+
+	check := true
+	normalEnd := []rune{'、', '，', '。', '？', '！', '～', '♪', '☆', '.', '—'}
+	unusualEnd := []rune{'）', '」', '』', '”'}
+
+	runes := []rune(text)
+	if len(runes) > 0 {
+		last := runes[len(runes)-1]
+		if containsRune(normalEnd, last) {
+			if strings.Contains(text, ".，") || strings.Contains(text, ".。") {
+				msg = "「……。」和「……，」只保留省略号"
+				check = false
+			}
+		} else if containsRune(unusualEnd, last) {
+			if len(runes) > 1 && !containsRune(normalEnd, runes[len(runes)-2]) {
+				msg = "句尾缺少逗号句号"
+				check = false
+			}
+		} else {
+			msg = "句尾缺少逗号句号"
+			check = false
+		}
+	}
+
+	// Check dashes (only if no msg yet, to avoid overwriting)
+	if msg == "" && strings.Contains(text, "—") {
+		dashCount := strings.Count(text, "—")
+		doubleDashCount := strings.Count(text, "——")
+		if dashCount != doubleDashCount*2 {
+			msg = "破折号用双破折——，或者视情况删掉"
+			check = false
+		}
+	}
+
+	// Check line length (only if no msg yet)
+	if msg == "" {
+		lineLen := lineLength(strings.Split(text, "\n")[0])
+		if lineLen >= 30 {
+			msg = "单行过长，请删减或换行"
+			check = false
+		}
+	}
+
+	return text, check, msg
+}

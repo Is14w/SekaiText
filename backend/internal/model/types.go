@@ -19,6 +19,7 @@ type DstTalk struct {
 	End       bool   `json:"end"`
 	Checked   bool   `json:"checked"`
 	Save      bool   `json:"save"`
+	Message   string `json:"message,omitempty"`
 	DstIdx    int    `json:"dstidx"`
 	ReferID   int    `json:"referid,omitempty"`
 	Proofread *bool  `json:"proofread,omitempty"`
@@ -136,7 +137,9 @@ type Settings struct {
 	SaveLineBreakN  bool   `json:"saveN"`
 	SaveVoice       bool   `json:"saveVoice"`
 	DisableSSL      bool   `json:"disableSSL"`
-	VoiceOutputDir  string `json:"voiceOutputDir,omitempty"`
+	VoiceOutputDir   string `json:"voiceOutputDir,omitempty"`
+	JsonDownloadDir  string `json:"jsonDownloadDir,omitempty"`
+
 	LastStoryType   string `json:"lastStoryType,omitempty"`
 	LastStorySort   string `json:"lastStorySort,omitempty"`
 	LastStoryIndex  string `json:"lastStoryIndex,omitempty"`
@@ -152,6 +155,8 @@ func DefaultSettings() Settings {
 		SaveLineBreakN: true,
 		SaveVoice:      false,
 		DisableSSL:     false,
+		JsonDownloadDir: "./downloads/json",
+
 	}
 }
 
@@ -309,4 +314,24 @@ type CharacterInfo struct {
 type UnitInfo struct {
 	Key  string `json:"key"`
 	Name string `json:"name"`
+}
+
+// JsonDownloadRequest downloads a story JSON to a directory.
+type JsonDownloadRequest struct {
+	StoryType string `json:"storyType"`
+	Sort      string `json:"sort"`
+	Index     string `json:"index"`
+	Chapter   int    `json:"chapter"`
+	Source    string `json:"source"`
+	OutputDir string `json:"outputDir"`
+}
+
+// DownloadTaskProgress tracks progress of an async download.
+type DownloadTaskProgress struct {
+	TaskID    string `json:"taskId"`
+	Status    string `json:"status"` // downloading, done, error
+	Read      int64  `json:"read"`
+	Total     int64  `json:"total"`
+	FilePath  string `json:"filePath,omitempty"`
+	Error     string `json:"error,omitempty"`
 }

@@ -15,6 +15,7 @@ export interface DstTalk {
   end: boolean
   checked: boolean
   save: boolean
+  message?: string
   dstidx: number
   referid?: number
   proofread?: boolean | null

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { ArrowLeft } from 'lucide-vue-next'
 import { useDebugLog } from '../composables/useDebugLog'
 
 const router = useRouter()
@@ -119,9 +120,10 @@ function clearAll() {
       <div class="flex items-center gap-3">
         <button
           @click="router.push('/')"
-          class="text-xs text-[#888] hover:text-[#fff] transition-colors"
+          class="text-xs text-[#888] hover:text-[#fff] transition-colors flex items-center gap-1"
         >
-          ← 返回
+          <ArrowLeft :size="14" />
+          返回
         </button>
         <span class="text-xs font-medium text-[#666]">debug.log</span>
       </div>

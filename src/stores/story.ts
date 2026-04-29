@@ -12,7 +12,7 @@ export const useStoryStore = defineStore('story', () => {
   const selectedType = ref('')
   const selectedSort = ref('')
   const selectedIndex = ref('')
-  const selectedChapter = ref(0)
+  const selectedChapter = ref(-1)
   const selectedSource = ref('haruki')
 
   const scenarioId = ref('')
@@ -61,7 +61,7 @@ export const useStoryStore = defineStore('story', () => {
       selectedType.value = ''
       selectedSort.value = ''
       selectedIndex.value = ''
-      selectedChapter.value = 0
+      selectedChapter.value = -1
     } finally {
       loading.value = false
     }

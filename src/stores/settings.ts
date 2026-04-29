@@ -11,6 +11,8 @@ export const useSettingsStore = defineStore('settings', () => {
     saveVoice: false,
     disableSSL: false,
     debugEnabled: false,
+    jsonDownloadDir: './downloads/json',
+
     indexOrder: 'asc',
   })
   const loading = ref(false)

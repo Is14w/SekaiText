@@ -110,7 +110,7 @@ func (e *EditorService) LoadFile(filepath string) ([]model.DstTalk, error) {
 
 		texts := strings.Split(fulltext, "\\N")
 		for iidx, text := range texts {
-			text, checked := e.checkText(speaker, text)
+			text, checked, msg := e.checkText(speaker, text)
 			talk := model.DstTalk{
 				Idx:     idx + 1,
 				Speaker: speaker,
@@ -119,6 +119,7 @@ func (e *EditorService) LoadFile(filepath string) ([]model.DstTalk, error) {
 				End:     false,
 				Checked: checked,
 				Save:    true,
+				Message: msg,
 			}
 			talks = append(talks, talk)
 		}
@@ -238,7 +239,7 @@ func (e *EditorService) CheckLines(srctalks []model.SourceTalk, loadtalks []mode
 			}
 
 			if !dstend && loadtalks[idx].Idx == dstidx {
-				text, _ := e.checkText(srctalk.Speaker, loadtalks[idx].Text)
+				text, _, msg := e.checkText(srctalk.Speaker, loadtalks[idx].Text)
 				talk := model.DstTalk{
 					Idx:     srcidx + 1,
 					Speaker: loadtalks[idx].Speaker,
@@ -247,6 +248,7 @@ func (e *EditorService) CheckLines(srctalks []model.SourceTalk, loadtalks []mode
 					End:     false,
 					Checked: true,
 					Save:    true,
+					Message: msg,
 				}
 				idx++
 				newtalks = append(newtalks, talk)
@@ -274,15 +276,20 @@ func (e *EditorService) CheckLines(srctalks []model.SourceTalk, loadtalks []mode
 
 		// Too many \N
 		for idx < len(loadtalks) && loadtalks[idx].Idx == dstidx {
-			text, _ := e.checkText(srctalk.Speaker, loadtalks[idx].Text)
+			text, _, chkMsg := e.checkText(srctalk.Speaker, loadtalks[idx].Text)
+			lineMsg := "分行不一致"
+			if chkMsg != "" {
+				lineMsg = chkMsg + "\n" + lineMsg
+			}
 			talk := model.DstTalk{
 				Idx:     srcidx + 1,
 				Speaker: loadtalks[idx].Speaker,
-				Text:    text + "\n【分行不一致】",
+				Text:    text,
 				Start:   false,
 				End:     true,
 				Checked: false,
 				Save:    true,
+				Message: lineMsg,
 			}
 			idx++
 			newtalks = append(newtalks, talk)
@@ -302,8 +309,12 @@ func (e *EditorService) CheckLines(srctalks []model.SourceTalk, loadtalks []mode
 		for _, talk := range loadtalks[idx:] {
 			newtalk := talk
 			newtalk.Idx = talk.Idx + idxdiff
-			newtalk.Text = talk.Text + "\n【多余行】"
 			newtalk.Checked = false
+			if newtalk.Message != "" {
+				newtalk.Message += "\n多余行"
+			} else {
+				newtalk.Message = "多余行"
+			}
 			newtalks = append(newtalks, newtalk)
 		}
 	}
@@ -385,10 +396,11 @@ func (e *EditorService) ChangeText(row int, text string, editormode int,
 	}
 
 	speaker := talks[row].Speaker
-	text, checked := e.checkText(speaker, text)
+	text, checked, msg := e.checkText(speaker, text)
 
 	if len(strings.Split(text, "\n")) > 1 {
 		checked = false
+		msg = "文本含换行符，请拆分至多行"
 	}
 
 	if speaker == "" {
@@ -399,10 +411,12 @@ func (e *EditorService) ChangeText(row int, text string, editormode int,
 	if editormode == 0 {
 		talks[row].Text = text
 		talks[row].Checked = checked
+		talks[row].Message = msg
 		dstidx := talks[row].DstIdx
 		if dstidx < len(dsttalks) {
 			dsttalks[dstidx].Text = text
 			dsttalks[dstidx].Checked = checked
+			dsttalks[dstidx].Message = msg
 		}
 		return talks, dsttalks
 	}
@@ -416,11 +430,13 @@ func (e *EditorService) ChangeText(row int, text string, editormode int,
 			newtalk.Checked = true
 			newtalk.Save = true
 			newtalk.Proofread = boolPtr(true)
+			newtalk.Message = msg
 
 			dstidx := talks[row].DstIdx
 			if dstidx < len(dsttalks) {
 				dsttalks[dstidx].Text = text
 				dsttalks[dstidx].Checked = checked
+				dsttalks[dstidx].Message = msg
 			}
 			newtalk.DstIdx = dstidx
 
@@ -429,6 +445,7 @@ func (e *EditorService) ChangeText(row int, text string, editormode int,
 			talks[row].Checked = false
 			talks[row].Save = false
 			talks[row].Proofread = boolPtr(false)
+			talks[row].Message = ""
 
 			return talks, dsttalks
 		}
@@ -436,10 +453,12 @@ func (e *EditorService) ChangeText(row int, text string, editormode int,
 		// Update existing proofread line
 		talks[row].Text = text
 		talks[row].Checked = true
+		talks[row].Message = msg
 		dstidx := talks[row].DstIdx
 		if dstidx < len(dsttalks) {
 			dsttalks[dstidx].Text = text
 			dsttalks[dstidx].Checked = checked
+			dsttalks[dstidx].Message = msg
 		}
 	}
 
@@ -545,21 +564,22 @@ func (e *EditorService) CheckProofread(talks []model.DstTalk, row int, checked b
 	}
 }
 
-// checkText validates text content and returns fixed text + pass/fail.
-func (e *EditorService) checkText(speaker, text string) (string, bool) {
+// checkText validates text content and returns fixed text, pass/fail, and warning message.
+func (e *EditorService) checkText(speaker, text string) (string, bool, string) {
+	var msg string
+
 	if speaker != "" && speaker != "场景" && speaker != "左上场景" && speaker != "选项" && text == "" {
-		text += "\n【空行，若不需要改行请点右侧“-”删去本行】"
-		return text, true
+		msg = "空行，若不需要改行请点右侧“-”删去本行"
+		return text, false, msg
 	}
 
-	lines := strings.Split(text, "\n")
-	text = strings.TrimRight(strings.TrimLeft(lines[0], " \t"), " \t")
+	text = strings.TrimSpace(strings.Split(text, "\n")[0])
 	if text == "" {
-		return text, true
+		return text, true, ""
 	}
 
 	if speaker == "场景" || speaker == "左上场景" || speaker == "" {
-		return text, true
+		return text, true, ""
 	}
 
 	if speaker == "选项" {
@@ -567,10 +587,10 @@ func (e *EditorService) checkText(speaker, text string) (string, bool) {
 			text += "/"
 		}
 		if strings.HasSuffix(text, "/") {
-			text += "\n【选项必须用/分隔】"
-			return text, false
+			msg = "选项必须用/分隔"
+			return text, false, msg
 		}
-		return text, true
+		return text, true, ""
 	}
 
 	// Standard text replacements
@@ -592,38 +612,40 @@ func (e *EditorService) checkText(speaker, text string) (string, bool) {
 		last := runes[len(runes)-1]
 		if containsRune(normalEnd, last) {
 			if strings.Contains(text, ".，") || strings.Contains(text, ".。") {
-				text += "\n【「……。」和「……，」只保留省略号】"
+				msg = "「……。」和「……，」只保留省略号"
 				check = false
 			}
 		} else if containsRune(unusualEnd, last) {
 			if len(runes) > 1 && !containsRune(normalEnd, runes[len(runes)-2]) {
-				text += "\n【句尾缺少逗号句号】"
+				msg = "句尾缺少逗号句号"
 				check = false
 			}
 		} else {
-			text += "\n【句尾缺少逗号句号】"
+			msg = "句尾缺少逗号句号"
 			check = false
 		}
 	}
 
-	// Check dashes
-	if strings.Contains(text, "—") {
+	// Check dashes (only if no msg yet, to avoid overwriting)
+	if msg == "" && strings.Contains(text, "—") {
 		dashCount := strings.Count(text, "—")
 		doubleDashCount := strings.Count(text, "——")
 		if dashCount != doubleDashCount*2 {
-			text += "\n【破折号用双破折——，或者视情况删掉】"
+			msg = "破折号用双破折——，或者视情况删掉"
 			check = false
 		}
 	}
 
-	// Check line length
-	lineLen := lineLength(strings.Split(text, "\n")[0])
-	if lineLen >= 30 {
-		text += "\n【单行过长，请删减或换行】"
-		check = false
+	// Check line length (only if no msg yet)
+	if msg == "" {
+		lineLen := lineLength(strings.Split(text, "\n")[0])
+		if lineLen >= 30 {
+			msg = "单行过长，请删减或换行"
+			check = false
+		}
 	}
 
-	return text, check
+	return text, check, msg
 }
 
 // UpdateHiddenRowMap builds compression/decompression maps for hidden rows.
@@ -682,15 +704,11 @@ func insertDstTalk(slice []model.DstTalk, index int, talk model.DstTalk) []model
 
 // GetTextCheck performs text validation and returns the result.
 func (e *EditorService) GetTextCheck(req model.CheckTextRequest) model.CheckTextResponse {
-	text, checked := e.checkText(req.Speaker, req.Text)
+	text, checked, msg := e.checkText(req.Speaker, req.Text)
 	resp := model.CheckTextResponse{
 		Text:    text,
 		Checked: checked,
-	}
-	// Extract message from the appended text
-	lines := strings.Split(text, "\n")
-	if len(lines) > 1 {
-		resp.Message = strings.Join(lines[1:], "\n")
+		Message: msg,
 	}
 	return resp
 }

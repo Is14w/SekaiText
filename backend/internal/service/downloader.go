@@ -110,6 +110,77 @@ func (d *Downloader) DownloadJSON(url, fileName string) (string, error) {
 	return filePath, nil
 }
 
+// DownloadProgressFn is called with (bytesRead, totalBytes) during download.
+type DownloadProgressFn func(read, total int64)
+
+// DownloadJSONToDir downloads a JSON file from URL to a specific directory.
+// If progress is non-nil, it is called periodically with bytes read and total bytes.
+func (d *Downloader) DownloadJSONToDir(url, dir, fileName string, progress DownloadProgressFn) (string, error) {
+	filePath := filepath.Join(dir, fileName)
+
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	// Check if already cached
+	if _, err := os.Stat(filePath); err == nil {
+		log.Printf("Cache hit: %s", filePath)
+		if progress != nil {
+			// Get file size for progress
+			info, _ := os.Stat(filePath)
+			progress(info.Size(), info.Size())
+		}
+		return filePath, nil
+	}
+
+	log.Printf("Downloading: %s -> %s", url, filePath)
+	resp, err := d.client.Get(url)
+	if err != nil {
+		return "", fmt.Errorf("download failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("download returned status %d", resp.StatusCode)
+	}
+
+	out, err := os.Create(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to create file: %w", err)
+	}
+	defer out.Close()
+
+	var reader io.Reader = resp.Body
+	if progress != nil && resp.ContentLength > 0 {
+		reader = &progressReader{reader: resp.Body, total: resp.ContentLength, fn: progress}
+	}
+
+	if _, err := io.Copy(out, reader); err != nil {
+		return "", fmt.Errorf("failed to write file: %w", err)
+	}
+
+	if progress != nil {
+		progress(resp.ContentLength, resp.ContentLength)
+	}
+
+	log.Printf("Downloaded: %s", filePath)
+	return filePath, nil
+}
+
+type progressReader struct {
+	reader io.Reader
+	total  int64
+	read   int64
+	fn     DownloadProgressFn
+}
+
+func (p *progressReader) Read(b []byte) (int, error) {
+	n, err := p.reader.Read(b)
+	p.read += int64(n)
+	p.fn(p.read, p.total)
+	return n, err
+}
+
 // DownloadAndParseJSON downloads a JSON file and parses it.
 func (d *Downloader) DownloadAndParseJSON(url, fileName string, target interface{}) error {
 	filePath, err := d.DownloadJSON(url, fileName)

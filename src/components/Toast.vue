@@ -1,7 +1,15 @@
 <script setup lang="ts">
+import { CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-vue-next'
 import { useToast } from '../composables/useToast'
 
 const { toasts } = useToast()
+
+const iconMap: Record<string, typeof CheckCircle> = {
+  success: CheckCircle,
+  error: XCircle,
+  info: Info,
+  warn: AlertTriangle,
+}
 </script>
 
 <template>
@@ -9,7 +17,7 @@ const { toasts } = useToast()
     <div
       v-for="t in toasts"
       :key="t.id"
-      class="pointer-events-auto px-4 py-2.5 rounded-lg shadow-lg border text-sm transition-all duration-300 animate-in"
+      class="pointer-events-auto px-4 py-2.5 rounded-lg shadow-lg border text-sm transition-all duration-300 animate-in flex items-center gap-2"
       :class="{
         'bg-green-50 border-green-200 text-green-800 dark:bg-green-900 dark:border-green-700 dark:text-green-200': t.type === 'success',
         'bg-red-50 border-red-200 text-red-800 dark:bg-red-900 dark:border-red-700 dark:text-red-200': t.type === 'error',
@@ -17,6 +25,7 @@ const { toasts } = useToast()
         'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:border-yellow-700 dark:text-yellow-200': t.type === 'warn',
       }"
     >
+      <component :is="iconMap[t.type]" :size="16" />
       {{ t.message }}
     </div>
   </div>
