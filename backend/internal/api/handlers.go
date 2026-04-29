@@ -3,7 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"sekaitext/backend/internal/config"
@@ -20,10 +22,11 @@ type Handler struct {
 	fb        *service.FlashbackAnalyzer
 	dl        *service.Downloader
 	progress  *service.ProgressTracker
+	logBuf    *service.LogBuffer
 }
 
 // NewHandler creates a new Handler with all services initialized.
-func NewHandler(cfg *config.AppConfig) *Handler {
+func NewHandler(cfg *config.AppConfig, logBuf *service.LogBuffer) *Handler {
 	lm := service.NewListManager(cfg.SettingDir)
 	fb := service.NewFlashbackAnalyzer(lm)
 	return &Handler{
@@ -34,6 +37,7 @@ func NewHandler(cfg *config.AppConfig) *Handler {
 		fb:         fb,
 		dl:         service.NewDownloader(cfg.DataDir),
 		progress:   service.NewProgressTracker(),
+		logBuf:     logBuf,
 	}
 }
 
@@ -452,6 +456,31 @@ func (h *Handler) Units(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) Areas(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, model.AreaDict)
+}
+
+// --- Debug ---
+
+func (h *Handler) DebugLogs(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, h.logBuf.Lines())
+}
+
+func (h *Handler) DebugSaveLogs(w http.ResponseWriter, r *http.Request) {
+	entries := h.logBuf.Lines()
+	f, err := os.Create("debug.log")
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to create log file: "+err.Error())
+		return
+	}
+	defer f.Close()
+
+	f.WriteString("=== SekaiText Debug Log === " + time.Now().Format("2006-01-02 15:04:05") + " ===\n\n")
+	for _, e := range entries {
+		f.WriteString("[" + e.Timestamp + "] " + e.Message + "\n")
+	}
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"status": "saved",
+		"lines":  len(entries),
+	})
 }
 
 // --- Helpers ---

@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 export const useAppStore = defineStore('app', () => {
   const fontSize = ref(18)
   const editorMode = ref<0 | 1 | 2>(0)
-  const showFlashback = ref(false)
+  const showFlashback = ref(true)
   const syncScroll = ref(true)
   const showDiff = ref(false)
   const saveN = ref(true)

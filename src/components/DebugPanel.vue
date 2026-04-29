@@ -1,12 +1,23 @@
 <script setup lang="ts">
+import { onMounted, watch } from 'vue'
 import { useDebugLog } from '../composables/useDebugLog'
+import { useSettingsStore } from '../stores/settings'
 
 const { logs, enabled, clear } = useDebugLog()
+const settings = useSettingsStore()
+
+onMounted(() => {
+  enabled.value = settings.settings.debugEnabled
+})
+
+watch(enabled, (v) => {
+  settings.settings.debugEnabled = v
+})
 </script>
 
 <template>
   <div
-    v-if="enabled"
+    v-show="enabled"
     class="fixed bottom-0 right-0 w-[420px] h-60 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-tl-xl shadow-2xl flex flex-col z-[9998] text-xs font-mono"
   >
     <div class="flex items-center justify-between px-3 py-1.5 border-b border-[var(--color-border)] bg-gray-50 dark:bg-gray-900 rounded-tl-xl">

@@ -3,19 +3,21 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { useEditorStore } from '../stores/editor'
+import { useSettingsStore } from '../stores/settings'
 import { api } from '../api/client'
 import { useToast } from '../composables/useToast'
 import { Minus, Square, X, Minimize } from 'lucide-vue-next'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import StoryNavigator from '../components/navigation/StoryNavigator.vue'
 import EditorWorkspace from '../components/editor/EditorWorkspace.vue'
-import DebugPanel from '../components/DebugPanel.vue'
 import SpeakerCountDialog from '../components/dialogs/SpeakerCountDialog.vue'
 import SpeakerCheckDialog from '../components/dialogs/SpeakerCheckDialog.vue'
+import SettingsDialog from '../components/dialogs/SettingsDialog.vue'
 
 const router = useRouter()
 const app = useAppStore()
 const editor = useEditorStore()
+const settings = useSettingsStore()
 const toast = useToast()
 
 const isTauri = typeof window !== 'undefined' && !!(window as any).__TAURI_INTERNALS__
@@ -68,6 +70,7 @@ async function closeWin(e: MouseEvent) {
 const showSpeakerCount = ref(false)
 const tauriErr = ref('')
 const showSpeakerCheck = ref(false)
+const showSettings = ref(false)
 const sidebarOpen = ref(true)
 
 function setMode(key: number) {
@@ -149,10 +152,10 @@ async function handleFullCheck() {
         <span class="font-bold" style="color: var(--color-primary); font-size: 15px">SekaiText</span>
       </div>
       <div class="flex items-center gap-1">
-        <button @mousedown.stop @click="minimizeWin" class="w-10 h-8 flex items-center justify-center rounded hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-[var(--color-text-secondary)]">
+        <button @mousedown.stop @click="minimizeWin" class="w-10 h-8 flex items-center justify-center rounded hover:text-[var(--color-primary)] transition-colors text-[var(--color-text-secondary)]">
           <Minus :size="14" />
         </button>
-        <button @mousedown.stop @click="toggleMaxWin" class="w-10 h-8 flex items-center justify-center rounded hover:bg-black/5 dark:hover:bg-white/10 text-[var(--color-text-secondary)] transition-colors">
+        <button @mousedown.stop @click="toggleMaxWin" class="w-10 h-8 flex items-center justify-center rounded hover:text-[var(--color-primary)] text-[var(--color-text-secondary)] transition-colors">
           <Minimize v-if="isMaximized" :size="12" />
           <Square v-else :size="12" />
         </button>
@@ -171,7 +174,7 @@ async function handleFullCheck() {
     >
       <button
         @click="sidebarOpen = !sidebarOpen"
-        class="flex items-center gap-2 h-10 px-3 text-[var(--color-text-secondary)] hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex-shrink-0"
+        class="flex items-center gap-2 h-10 px-3 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors flex-shrink-0"
       >
         <span class="text-lg flex-shrink-0 w-5 text-center leading-none">{{ sidebarOpen ? '◁' : '▷' }}</span>
         <span v-if="sidebarOpen" class="text-xs font-medium">模式</span>
@@ -187,7 +190,7 @@ async function handleFullCheck() {
           class="flex items-center gap-2.5 h-9 px-2 rounded-lg transition-colors text-sm flex-shrink-0"
           :class="app.editorMode === m.key
             ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
-            : 'text-[var(--color-text-secondary)] hover:bg-black/5 dark:hover:bg-white/10'"
+            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'"
         >
           <span class="w-5 text-center flex-shrink-0 text-base leading-none">{{ m.icon }}</span>
           <span v-if="sidebarOpen" class="whitespace-nowrap">{{ m.label }}</span>
@@ -198,19 +201,20 @@ async function handleFullCheck() {
 
       <div class="border-t border-[var(--color-border)] p-1.5 space-y-0.5">
         <router-link
+          v-if="settings.settings.debugEnabled"
           to="/debug"
-          class="flex items-center gap-2.5 h-9 w-full px-2 rounded-lg transition-colors text-sm text-[var(--color-text-secondary)] hover:bg-black/5 dark:hover:bg-white/10"
+          class="flex items-center gap-2.5 h-9 w-full px-2 rounded-lg transition-colors text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
         >
           <span class="w-5 text-center flex-shrink-0 text-base leading-none">🐛</span>
           <span v-if="sidebarOpen" class="whitespace-nowrap">调试</span>
         </router-link>
-        <router-link
-          to="/settings"
-          class="flex items-center gap-2.5 h-9 w-full px-2 rounded-lg transition-colors text-sm text-[var(--color-text-secondary)] hover:bg-black/5 dark:hover:bg-white/10"
+        <button
+          @click="showSettings = true"
+          class="flex items-center gap-2.5 h-9 w-full px-2 rounded-lg transition-colors text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
         >
           <span class="w-5 text-center flex-shrink-0 text-base leading-none">⚙</span>
           <span v-if="sidebarOpen" class="whitespace-nowrap">设置</span>
-        </router-link>
+        </button>
       </div>
     </aside>
 
@@ -222,27 +226,27 @@ async function handleFullCheck() {
 
       <div class="border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1.5">
         <div class="flex items-center gap-2 flex-wrap text-sm">
-          <button @click="handleOpen" class="px-2.5 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">打开</button>
-          <button @click="handleSave" class="px-2.5 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">保存</button>
-          <button @click="handleClear" class="px-2.5 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">清空</button>
+          <button @click="handleOpen" class="px-2.5 py-1 rounded text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors">打开</button>
+          <button @click="handleSave" class="px-2.5 py-1 rounded text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors">保存</button>
+          <button @click="handleClear" class="px-2.5 py-1 rounded text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors">清空</button>
 
           <div class="w-px h-4 bg-[var(--color-border)]" />
 
-          <label class="flex items-center gap-1 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-text)]">
+          <label class="flex items-center gap-1 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]">
             <input v-model="app.showFlashback" type="checkbox" class="accent-[var(--color-primary)] w-3 h-3" />闪回
           </label>
-          <label class="flex items-center gap-1 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-text)]">
+          <label class="flex items-center gap-1 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]">
             <input v-model="app.syncScroll" type="checkbox" class="accent-[var(--color-primary)] w-3 h-3" />同步
           </label>
-          <label class="flex items-center gap-1 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-text)]">
+          <label class="flex items-center gap-1 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]">
             <input v-model="app.showDiff" type="checkbox" class="accent-[var(--color-primary)] w-3 h-3" />差异
           </label>
 
           <div class="w-px h-4 bg-[var(--color-border)]" />
 
-          <button @click="showSpeakerCheck = true" class="px-2.5 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">说话人</button>
-          <button @click="handleFullCheck" class="px-2.5 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">检查</button>
-          <button @click="showSpeakerCount = true" class="px-2.5 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">统计</button>
+          <button @click="showSpeakerCheck = true" class="px-2.5 py-1 rounded text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors">说话人</button>
+          <button @click="handleFullCheck" class="px-2.5 py-1 rounded text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors">检查</button>
+          <button @click="showSpeakerCount = true" class="px-2.5 py-1 rounded text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors">统计</button>
         </div>
       </div>
 
@@ -254,7 +258,7 @@ async function handleFullCheck() {
 
     <SpeakerCountDialog v-if="showSpeakerCount" @close="showSpeakerCount = false" />
     <SpeakerCheckDialog v-if="showSpeakerCheck" @close="showSpeakerCheck = false" />
-    <DebugPanel />
+    <SettingsDialog v-if="showSettings" @close="showSettings = false" />
   </div>
 </template>
 

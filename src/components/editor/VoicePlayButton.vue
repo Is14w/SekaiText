@@ -39,7 +39,7 @@ async function play() {
 <template>
   <button
     @click="play"
-    class="w-8 h-8 rounded-full border border-[var(--color-border)] flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-xs"
+    class="w-8 h-8 rounded-full border border-[var(--color-border)] flex items-center justify-center hover:text-[var(--color-primary)] transition-colors text-xs"
     :class="{ 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]': playing }"
     :title="playing ? '停止' : '播放语音'"
   >

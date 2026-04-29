@@ -27,7 +27,7 @@ const bracketOptions = [
     <button
       v-for="opt in bracketOptions"
       :key="opt.value"
-      class="w-full text-left px-3 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+      class="w-full text-left px-3 py-1.5 text-sm hover:text-[var(--color-primary)] transition-colors"
       @click="emit('select', opt.value)"
     >
       {{ opt.label }}

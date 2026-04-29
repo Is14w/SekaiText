@@ -1,23 +1,27 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	"sekaitext/backend/internal/config"
+	"sekaitext/backend/internal/service"
 )
 
 // NewRouter creates and returns a chi router with all routes and middleware configured.
 func NewRouter(cfg *config.AppConfig) http.Handler {
-	h := NewHandler(cfg)
+	logBuf := service.NewLogBuffer(200)
+	h := NewHandler(cfg, logBuf)
 	r := chi.NewRouter()
 
 	// Middleware
-	r.Use(chimw.Logger)
-	r.Use(chimw.Recoverer)
 	r.Use(chimw.RequestID)
+	r.Use(chimw.Recoverer)
+	r.Use(requestLogger(logBuf))
 
 	// CORS - allow all origins in dev
 	corsHandler := cors.New(cors.Options{
@@ -37,6 +41,10 @@ func NewRouter(cfg *config.AppConfig) http.Handler {
 
 	// API v1
 	r.Route("/api/v1", func(r chi.Router) {
+		// Debug
+		r.Get("/debug/logs", h.DebugLogs)
+			r.Post("/debug/save", h.DebugSaveLogs)
+
 		// Story navigation
 		r.Route("/story", func(r chi.Router) {
 			r.Get("/types", h.StoryTypes)
@@ -100,4 +108,20 @@ func NewRouter(cfg *config.AppConfig) http.Handler {
 	})
 
 	return r
+}
+
+// requestLogger is a custom middleware that logs requests and writes to the log buffer.
+func requestLogger(buf *service.LogBuffer) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			ww := chimw.NewWrapResponseWriter(w, r.ProtoMajor)
+			next.ServeHTTP(ww, r)
+			latency := time.Since(start)
+			msg := fmt.Sprintf("%s %s %d %s",
+				r.Method, r.URL.Path, ww.Status(), latency.Round(time.Millisecond))
+			buf.Write(msg)
+			fmt.Println("[server]", msg)
+		})
+	}
 }

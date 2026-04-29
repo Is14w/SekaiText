@@ -1,4 +1,8 @@
+import { useDebugLog } from '../composables/useDebugLog'
+
 const BASE_URL = '/api/v1'
+
+const { log: debugLog } = useDebugLog()
 
 class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -8,21 +12,37 @@ class ApiError extends Error {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const method = (options.method || 'GET').toUpperCase()
   const url = `${BASE_URL}${path}`
-  const res = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  })
+  const start = Date.now()
+  debugLog(`→ ${method} ${path}`, 'info')
 
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ error: res.statusText }))
-    throw new ApiError(res.status, body.error || res.statusText)
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    })
+
+    const elapsed = Date.now() - start
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ error: res.statusText }))
+      debugLog(`← ${method} ${path} ${res.status} ${elapsed}ms`, 'error')
+      throw new ApiError(res.status, body.error || res.statusText)
+    }
+
+    const data = await res.json()
+    debugLog(`← ${method} ${path} ${res.status} ${elapsed}ms`, 'info')
+    return data
+  } catch (e) {
+    if (!(e instanceof ApiError)) {
+      debugLog(`← ${method} ${path} FAILED`, 'error')
+    }
+    throw e
   }
-
-  return res.json()
 }
 
 export const api = {

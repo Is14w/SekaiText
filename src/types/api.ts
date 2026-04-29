@@ -6,6 +6,7 @@ export interface Settings {
   saveN: boolean
   saveVoice: boolean
   disableSSL: boolean
+  debugEnabled: boolean
   indexOrder: 'asc' | 'desc'
   voiceOutputDir?: string
   lastStoryType?: string

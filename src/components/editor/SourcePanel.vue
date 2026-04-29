@@ -66,7 +66,7 @@ const talksWithFlashback = computed(() => {
           class="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden bg-[var(--color-surface)] border border-[var(--color-border)]"
         >
           <img
-            v-if="talk.charIndex >= 0 && !iconErrors.has(talk.charIndex)"
+            v-if="talk.charIndex >= 0 && !iconErrors.has(talk.charIndex) && !['场景', '左上场景', '选项', ''].includes(talk.speaker)"
             :src="api.characterIconUrl(talk.charIndex + 1)"
             :alt="talk.speaker"
             class="w-full h-full object-cover"

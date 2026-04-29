@@ -252,13 +252,12 @@ func (lm *ListManager) GetStoryIndexList(storyType, sort string) []model.StoryIn
 		}
 
 	case StoryLabelEvent, StoryLabelCardEvent:
-		eventSum := len(lm.Events)
 		for i := len(lm.Events) - 1; i >= 0; i-- {
 			ev := lm.Events[i]
-			label := strconv.Itoa(eventSum-i) + " " + ev.Title
+			label := strconv.Itoa(ev.ID) + " " + ev.Title
 			indices = append(indices, model.StoryIndex{
 				Label: label,
-				Value: strconv.Itoa(eventSum - 1 - i),
+				Value: strconv.Itoa(ev.ID),
 			})
 		}
 
@@ -363,22 +362,20 @@ func (lm *ListManager) GetStoryChapterList(storyType, sort, index string) []mode
 			}
 		}
 
-	case StoryLabelEvent:
-		eventIdx := len(lm.Events) - idx
-		if eventIdx >= 1 && eventIdx <= len(lm.Events) {
-			for ci, chapter := range lm.Events[eventIdx-1].Chapters {
-				chapters = append(chapters, model.StoryChapter{
-					Number: ci,
-					Label:  strconv.Itoa(ci+1) + " " + chapter.Title,
-				})
+		case StoryLabelEvent:
+			event := lm.findEventByID(idx)
+			if event != nil {
+				for ci, chapter := range event.Chapters {
+					chapters = append(chapters, model.StoryChapter{
+						Number: ci,
+						Label:  strconv.Itoa(ci+1) + " " + chapter.Title,
+					})
+				}
 			}
-		}
-
-	case StoryLabelCardEvent:
-		content := lm.Events
-		contentIdx := len(content) - idx
-		if contentIdx >= 1 && contentIdx <= len(content) {
-			for _, cardID := range content[contentIdx-1].Cards {
+		case StoryLabelCardEvent:
+		event := lm.findEventByID(idx)
+		if event != nil {
+			for _, cardID := range event.Cards {
 				if cardID >= 1 && cardID <= len(lm.Cards) {
 					char := model.CharacterDict[lm.Cards[cardID-1].CharacterID-1]
 					chapters = append(chapters,
@@ -536,50 +533,44 @@ func (lm *ListManager) GetJsonPath(storyType, sort, index string, chapterIdx int
 			FileName: "mainStory_" + chapter + ".json",
 		}
 
-	case StoryLabelEvent:
-		eventIdx := len(lm.Events) - idx
-		if eventIdx < 1 || eventIdx > len(lm.Events) {
+		case StoryLabelEvent:
+			ev := lm.findEventByID(idx)
+			if ev == nil || chapterIdx >= len(ev.Chapters) {
+				return model.JsonPathResult{}
+			}
+			chapter := ev.Chapters[chapterIdx].AssetName
+			var url string
+			if format == "best" {
+				url = baseURL + "event_story/" + ev.Name + "/scenario/" + chapter + "." + extension
+			} else {
+				url = baseURL + "ondemand/event_story/" + ev.Name + "/scenario/" + chapter + "." + extension
+			}
+			return model.JsonPathResult{
+				URL:      url,
+				FileName: chapter + ".json",
+			}
+		case StoryLabelCardEvent:
+			ev := lm.findEventByID(idx)
+			if ev == nil {
+				return model.JsonPathResult{}
+			}
+			cardSlot := chapterIdx / 3
+			if cardSlot >= len(ev.Cards) {
 			return model.JsonPathResult{}
-		}
-		ev := lm.Events[eventIdx-1]
-		if chapterIdx >= len(ev.Chapters) {
-			return model.JsonPathResult{}
-		}
-		chapter := ev.Chapters[chapterIdx].AssetName
-		var url string
-		if format == "best" {
-			url = baseURL + "event_story/" + ev.Name + "/scenario/" + chapter + "." + extension
-		} else {
-			url = baseURL + "ondemand/event_story/" + ev.Name + "/scenario/" + chapter + "." + extension
-		}
-		return model.JsonPathResult{
-			URL:      url,
-			FileName: chapter + ".json",
-		}
-
-	case StoryLabelCardEvent:
-		eventIdx := len(lm.Events) - idx
-		if eventIdx < 1 || eventIdx > len(lm.Events) {
-			return model.JsonPathResult{}
-		}
-		ev := lm.Events[eventIdx-1]
-		cardSlot := chapterIdx / 3
-		if cardSlot >= len(ev.Cards) {
-			return model.JsonPathResult{}
-		}
-		cardID := ev.Cards[cardSlot]
-		cardCharID := lm.Cards[cardID-1].CharacterID
-		cardNo := lm.Cards[cardID-1].CardNo
-		ch := padZero(chapterIdx%3 + 1)
-		char := model.CharacterDict[cardCharID-1]
-		charID := padZero3(cardCharID)
-		var url string
-		if format == "best" {
+			}
+			cardID := ev.Cards[cardSlot]
+			cardCharID := lm.Cards[cardID-1].CharacterID
+			cardNo := lm.Cards[cardID-1].CardNo
+			ch := padZero(chapterIdx%3 + 1)
+			char := model.CharacterDict[cardCharID-1]
+			charID := padZero3(cardCharID)
+			var url string
+			if format == "best" {
 			url = baseURL + "character/member/res" + charID + "_no" + cardNo + "/" + charID + cardNo + "_" + char.Name + ch + "." + extension
-		} else {
+			} else {
 			url = baseURL + "startapp/character/member/res" + charID + "_no" + cardNo + "/" + charID + cardNo + "_" + char.Name + ch + "." + extension
-		}
-		return model.JsonPathResult{
+			}
+			return model.JsonPathResult{
 			URL:      url,
 			FileName: "event" + padZero3(ev.ID) + "_" + char.Name + "_" + ch + ".json",
 		}
@@ -774,6 +765,15 @@ func padZero(n int) string {
 
 func padZero3(n int) string {
 	return strconv.Itoa(1000 + n)[1:]
+}
+
+func (lm *ListManager) findEventByID(id int) *EventEntry {
+	for i := range lm.Events {
+		if lm.Events[i].ID == id {
+			return &lm.Events[i]
+		}
+	}
+	return nil
 }
 
 // --- Voice Clue Inference ---

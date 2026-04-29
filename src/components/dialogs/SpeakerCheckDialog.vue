@@ -61,7 +61,7 @@ onMounted(async () => {
 
       <div class="flex justify-end gap-2 mt-4">
         <button
-          class="px-4 py-1.5 rounded text-sm border border-[var(--color-border)] hover:bg-black/5 dark:hover:bg-white/10"
+          class="px-4 py-1.5 rounded text-sm border border-[var(--color-border)] hover:text-[var(--color-primary)]"
           @click="emit('close')"
         >
           取消

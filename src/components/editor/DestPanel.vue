@@ -119,7 +119,7 @@ function handleContextMenu(e: MouseEvent, row: number) {
       v-for="(talk, idx) in editor.talks"
       :key="idx"
       :class="getRowClass(talk)"
-      class="p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+      class="p-2 hover:bg-[var(--color-primary)]/[0.04] transition-colors"
     >
       <div class="flex items-start gap-2">
         <div class="w-8 flex-shrink-0 text-xs text-[var(--color-text-secondary)] pt-1">
@@ -150,7 +150,7 @@ function handleContextMenu(e: MouseEvent, row: number) {
           <span v-if="!talk.end && talk.save" class="text-xs text-[var(--color-text-secondary)] font-mono">\N</span>
           <button
             v-if="talk.end && !['场景', '左上场景', '选项', ''].includes(talk.speaker) && talk.save"
-            class="w-6 h-6 rounded border border-[var(--color-border)] text-xs hover:bg-black/5 dark:hover:bg-white/10"
+            class="w-6 h-6 rounded border border-[var(--color-border)] text-xs hover:text-[var(--color-primary)]"
             title="添加行"
             @click="handleAddLine(idx)"
           >+</button>

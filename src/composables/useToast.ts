@@ -3,7 +3,7 @@ import { ref } from 'vue'
 export interface Toast {
   id: number
   message: string
-  type: 'success' | 'error' | 'info'
+  type: 'success' | 'error' | 'info' | 'warn'
 }
 
 const toasts = ref<Toast[]>([])

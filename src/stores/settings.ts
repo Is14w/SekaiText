@@ -10,7 +10,8 @@ export const useSettingsStore = defineStore('settings', () => {
     saveN: true,
     saveVoice: false,
     disableSSL: false,
-    indexOrder: 'desc',
+    debugEnabled: false,
+    indexOrder: 'asc',
   })
   const loading = ref(false)
 

@@ -196,7 +196,7 @@ async function handleLoad() {
     />
     <button
       @click="fileInput?.click()"
-      class="px-3 py-1 rounded text-sm transition-colors border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-black/5 dark:hover:bg-white/10"
+      class="px-3 py-1 rounded text-sm transition-colors border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
       :disabled="story.loading"
     >
       本地
