@@ -50,13 +50,15 @@ const emit = defineEmits<{
         </div>
 
         <div class="flex items-center justify-between">
-          <label class="text-sm">暗色主题</label>
-          <input
-            :checked="app.isDark"
-            type="checkbox"
-            class="accent-[var(--color-primary)]"
-            @change="app.toggleTheme()"
-          />
+          <label class="text-sm">外观模式</label>
+          <select
+            v-model="app.themeMode"
+            class="px-2 py-1 rounded border border-[var(--color-border)] bg-[var(--color-bg)] text-sm"
+          >
+            <option value="system">跟随系统</option>
+            <option value="light">浅色</option>
+            <option value="dark">深色</option>
+          </select>
         </div>
       </div>
 
