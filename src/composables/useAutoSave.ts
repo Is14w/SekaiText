@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { useEditorStore } from '../stores/editor'
 import { useAppStore } from '../stores/app'
+import { useStoryStore } from '../stores/story'
 import { api } from '../api/client'
 
 /**
@@ -10,6 +11,7 @@ import { api } from '../api/client'
 export function useAutoSave(intervalMs = 30000) {
   const editor = useEditorStore()
   const app = useAppStore()
+  const story = useStoryStore()
   const lastSaved = ref(Date.now())
   let timer: ReturnType<typeof setInterval> | null = null
 
@@ -18,13 +20,18 @@ export function useAutoSave(intervalMs = 30000) {
     timer = setInterval(async () => {
       if (!editor.hasUnsavedChanges || editor.talks.length === 0) return
 
-      // Always save recovery file
+      // Always save recovery file with story context
       try {
         await api.recoverySave({
           talks: editor.dstTalks,
           saveN: app.saveN,
           filePath: editor.currentFilePath,
           editorMode: app.editorMode,
+          storyType: story.selectedType || undefined,
+          storySort: story.selectedSort || undefined,
+          storyIndex: story.selectedIndex || undefined,
+          storyChapter: story.selectedChapter >= 0 ? story.selectedChapter : undefined,
+          storySource: story.selectedSource || undefined,
         })
       } catch {
         // Silent fail on recovery save

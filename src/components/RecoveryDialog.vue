@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { api } from '../api/client'
 import { useEditorStore } from '../stores/editor'
 import { useAppStore } from '../stores/app'
+import { useStoryStore } from '../stores/story'
 import { AlertTriangle } from 'lucide-vue-next'
 
 const emit = defineEmits<{
@@ -11,8 +13,11 @@ const emit = defineEmits<{
 
 const editor = useEditorStore()
 const app = useAppStore()
+const story = useStoryStore()
+const loading = ref(false)
 
 async function handleRestore() {
+  loading.value = true
   try {
     const result = await api.recoveryLoad()
     if (result.exists && result.content) {
@@ -20,10 +25,32 @@ async function handleRestore() {
       editor.setTalks(talks, talks, [])
       if (result.filePath) editor.currentFilePath = result.filePath
       if (result.editorMode != null) app.setEditorMode(result.editorMode as 0 | 1 | 2)
+
+      // Restore story context and re-load source text
+      if (result.storyType) {
+        story.selectedType = result.storyType
+        story.selectedSort = result.storySort || ''
+        story.selectedIndex = result.storyIndex || ''
+        story.selectedChapter = result.storyChapter ?? -1
+        story.selectedSource = result.storySource || 'haruki'
+        try {
+          await story.loadStory()
+          if (story.sourceTalks.length > 0) {
+            const aligned = await api.checkLines({
+              sourceTalks: story.sourceTalks,
+              loadedTalks: talks,
+            })
+            editor.setTalks(aligned, talks, [])
+          }
+        } catch {
+          // Story re-load failed; keep recovered talks as-is
+        }
+      }
     }
   } catch {
     // Recovery failed, continue without it
   } finally {
+    loading.value = false
     emit('restore')
   }
 }
@@ -56,15 +83,17 @@ async function handleDiscard() {
       <div class="flex justify-end gap-2 mt-6">
         <button
           @click="handleDiscard"
-          class="px-4 py-2 text-sm rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors"
+          :disabled="loading"
+          class="px-4 py-2 text-sm rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors disabled:opacity-40"
         >
           丢弃
         </button>
         <button
           @click="handleRestore"
-          class="px-4 py-2 text-sm rounded-lg bg-[var(--color-primary)] text-white hover:opacity-90 transition-opacity"
+          :disabled="loading"
+          class="px-4 py-2 text-sm rounded-lg bg-[var(--color-primary)] text-white hover:opacity-90 transition-opacity disabled:opacity-40"
         >
-          恢复
+          {{ loading ? '恢复中...' : '恢复' }}
         </button>
       </div>
     </div>

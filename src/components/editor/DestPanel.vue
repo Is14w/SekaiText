@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useEditorStore } from '../../stores/editor'
 import { useAppStore } from '../../stores/app'
 import { api } from '../../api/client'
@@ -9,7 +10,27 @@ const editor = useEditorStore()
 const app = useAppStore()
 const toast = useToast()
 
+const listRef = ref<HTMLElement | null>(null)
+
 let editTimeout: ReturnType<typeof setTimeout> | null = null
+
+function focusNext(e: KeyboardEvent) {
+  e.preventDefault()
+  const container = listRef.value
+  if (!container) return
+  const editables = container.querySelectorAll<HTMLElement>('[contenteditable="true"]')
+  const idx = Array.from(editables).indexOf(e.target as HTMLElement)
+  const next = editables[idx + 1]
+  if (next) {
+    next.focus()
+    const range = document.createRange()
+    range.selectNodeContents(next)
+    range.collapse(false)
+    const sel = window.getSelection()
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+  }
+}
 
 function onBlur(e: Event, idx: number) {
   handleTextChange(idx, (e.target as HTMLElement).innerText)
@@ -38,7 +59,6 @@ async function handleTextChange(row: number, newText: string) {
         talks: editor.talks,
         dstTalks: editor.dstTalks,
         referTalks: editor.referTalks,
-        sourceTalks: editor.sourceTalks,
       })
       editor.setTalks(result.talks, result.dstTalks, editor.referTalks)
       editor.markUnsaved()
@@ -55,7 +75,6 @@ async function handleAddLine(row: number) {
       talks: editor.talks,
       dstTalks: editor.dstTalks,
       isProofreading: app.editorMode !== 0,
-      sourceTalks: editor.sourceTalks,
     })
     editor.setTalks(result.talks, result.dstTalks, editor.referTalks)
     editor.markUnsaved()
@@ -114,7 +133,7 @@ function handleContextMenu(e: MouseEvent, row: number) {
     载入故事后点击"载入"以创建翻译模板，或使用"打开"加载已有翻译文件
   </div>
 
-  <div v-else class="divide-y divide-[var(--color-border)]">
+  <div ref="listRef" v-else class="divide-y divide-[var(--color-border)]">
     <div
       v-for="(talk, idx) in editor.talks"
       :key="idx"
@@ -140,6 +159,7 @@ function handleContextMenu(e: MouseEvent, row: number) {
             class="text-sm leading-relaxed outline-none rounded px-1 -mx-1"
             :class="{ 'cursor-text': talk.start }"
             @blur="onBlur($event, idx)"
+            @keydown.enter.prevent="focusNext"
           >{{ talk.text }}</div>
           <div v-if="!talk.checked && talk.save && talk.text.includes('【')" class="text-xs text-red-400 mt-0.5">
             {{ talk.text.split('【')[1]?.replace('】', '') }}

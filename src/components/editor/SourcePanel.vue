@@ -3,12 +3,14 @@ import { computed, ref } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import { useAppStore } from '../../stores/app'
 import { api } from '../../api/client'
+import { useFlashbackTooltip } from '../../composables/useFlashbackTooltip'
 import VoicePlayButton from './VoicePlayButton.vue'
 
 const iconErrors = ref<Set<number>>(new Set())
 
 const story = useStoryStore()
 const app = useAppStore()
+const { visible, tooltipStyle, clueGroups, show: showTooltip, hide: hideTooltip } = useFlashbackTooltip()
 
 const talksWithFlashback = computed(() => {
   if (!app.showFlashback) {
@@ -41,6 +43,12 @@ const talksWithFlashback = computed(() => {
     return { ...talk, isFlashback }
   })
 })
+
+function onEnter(e: MouseEvent, talk: typeof talksWithFlashback.value[0]) {
+  if (talk.isFlashback && talk.clues) {
+    showTooltip(e, talk.clues.filter(c => !!c))
+  }
+}
 </script>
 
 <template>
@@ -59,7 +67,8 @@ const talksWithFlashback = computed(() => {
       :key="idx"
       class="p-3 transition-colors"
       :class="{ 'bg-[var(--color-flashback)]': talk.isFlashback }"
-      :title="talk.isFlashback && talk.clues ? '闪回线索: ' + talk.clues.filter(c => c).join(', ') : undefined"
+      @mouseenter="onEnter($event, talk)"
+      @mouseleave="hideTooltip()"
     >
       <div class="flex items-start gap-3">
         <div
@@ -98,4 +107,28 @@ const talksWithFlashback = computed(() => {
       </div>
     </div>
   </div>
+
+  <Teleport to="body">
+    <div
+      v-if="visible && clueGroups.length > 0"
+      :style="tooltipStyle"
+      class="flashback-tooltip rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg p-3 text-xs pointer-events-none"
+    >
+      <div class="font-semibold text-[var(--color-primary)] mb-1.5">闪回来源</div>
+      <template v-for="(group, gi) in clueGroups" :key="gi">
+        <div
+          v-if="gi > 0"
+          class="border-t border-[var(--color-border)] my-1.5"
+        />
+        <div
+          v-for="(hint, hi) in group.hints"
+          :key="hi"
+          class="text-[var(--color-text-secondary)] leading-relaxed"
+          :class="hi === 0 ? 'font-medium' : 'text-xs opacity-80'"
+        >
+          {{ hint }}
+        </div>
+      </template>
+    </div>
+  </Teleport>
 </template>

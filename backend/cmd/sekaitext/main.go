@@ -14,7 +14,8 @@ import (
 
 func main() {
 	port := flag.Int("port", 9800, "server port")
-	dir := flag.String("dir", ".", "base directory for resources")
+	dir := flag.String("dir", ".", "base directory for read-only resources (images)")
+	dataDir := flag.String("data-dir", "", "base directory for writable data (catalog, settings); defaults to --dir")
 	flag.Parse()
 
 	// Resolve base directory:
@@ -33,9 +34,9 @@ func main() {
 		}
 	}
 
-	cfg := config.NewAppConfig(baseDir)
+	cfg := config.NewAppConfig(baseDir, *dataDir)
 
-	// Ensure resource directories exist
+	// Ensure writable directories exist
 	ensureDir(cfg.CatalogDir)
 	ensureDir(cfg.DataDir)
 	ensureDir(cfg.ImagesChrDir)
@@ -44,7 +45,8 @@ func main() {
 
 	addr := fmt.Sprintf(":%d", *port)
 	log.Printf("SekaiText server starting on %s", addr)
-	log.Printf("Base directory: %s", baseDir)
+	log.Printf("Resource directory: %s", cfg.BaseDir)
+	log.Printf("Data directory: %s", cfg.DataBaseDir)
 
 	if err := http.ListenAndServe(addr, router); err != nil {
 		log.Fatalf("Server failed: %v", err)

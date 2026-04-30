@@ -85,8 +85,19 @@ export const useEditorStore = defineStore('editor', () => {
     majorClue.value = state.majorClue
   }
 
-  function switchMode(newMode: EditorMode) {
+  function switchMode(newMode: EditorMode, preserve: boolean = true) {
     saveModeState(currentMode.value)
+    if (preserve && !modeCache.has(newMode)) {
+      // Seed the new mode with a copy of the current state so work is preserved
+      modeCache.set(newMode, {
+        talks: [...talks.value],
+        dstTalks: [...dstTalks.value],
+        referTalks: [...referTalks.value],
+        currentFilePath: currentFilePath.value,
+        hasUnsavedChanges: hasUnsavedChanges.value,
+        majorClue: majorClue.value,
+      })
+    }
     currentMode.value = newMode
     loadModeState(newMode)
   }

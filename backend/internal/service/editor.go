@@ -517,7 +517,7 @@ func groupByIdx(talks []model.DstTalk) map[int][]model.DstTalk {
 
 // ChangeText handles text editing with proofread mode logic.
 func (e *EditorService) ChangeText(row int, text string, editormode int,
-	talks, dsttalks, refertalks []model.DstTalk, srctalks []model.SourceTalk) ([]model.DstTalk, []model.DstTalk) {
+	talks, dsttalks, refertalks []model.DstTalk) ([]model.DstTalk, []model.DstTalk) {
 
 	if row >= len(talks) {
 		return talks, dsttalks

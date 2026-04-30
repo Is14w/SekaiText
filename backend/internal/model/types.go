@@ -135,15 +135,16 @@ type JsonPathResult struct {
 
 // Settings represents application settings.
 type Settings struct {
-	FontSize        int    `json:"fontSize"`
-	DownloadSource  string `json:"downloadSource"`
-	SaveLineBreakN  bool   `json:"saveN"`
-	SaveVoice       bool   `json:"saveVoice"`
-	DisableSSL      bool   `json:"disableSSL"`
-	VoiceOutputDir   string `json:"voiceOutputDir,omitempty"`
-	JsonDownloadDir  string `json:"jsonDownloadDir,omitempty"`
-	DebugEnabled     bool   `json:"debugEnabled"`
-	IndexOrder       string `json:"indexOrder"`
+	FontSize                  int    `json:"fontSize"`
+	DownloadSource            string `json:"downloadSource"`
+	SaveLineBreakN            bool   `json:"saveN"`
+	SaveVoice                 bool   `json:"saveVoice"`
+	DisableSSL                bool   `json:"disableSSL"`
+	VoiceOutputDir            string `json:"voiceOutputDir,omitempty"`
+	JsonDownloadDir           string `json:"jsonDownloadDir,omitempty"`
+	DebugEnabled              bool   `json:"debugEnabled"`
+	IndexOrder                string `json:"indexOrder"`
+	PreserveStoryOnModeSwitch bool   `json:"preserveStoryOnModeSwitch"`
 
 	LastStoryType   string `json:"lastStoryType,omitempty"`
 	LastStorySort   string `json:"lastStorySort,omitempty"`
@@ -155,14 +156,15 @@ type Settings struct {
 // DefaultSettings returns sensible defaults.
 func DefaultSettings() Settings {
 	return Settings{
-		FontSize:       18,
-		DownloadSource: "best",
-		SaveLineBreakN: true,
-		SaveVoice:      false,
-		DisableSSL:     false,
-		JsonDownloadDir: "./downloads/json",
-		DebugEnabled:    false,
-		IndexOrder:      "asc",
+		FontSize:                  18,
+		DownloadSource:            "best",
+		SaveLineBreakN:            true,
+		SaveVoice:                 false,
+		DisableSSL:                false,
+		JsonDownloadDir:           "./downloads/json",
+		DebugEnabled:              false,
+		IndexOrder:                "asc",
+		PreserveStoryOnModeSwitch: true,
 	}
 }
 
@@ -218,7 +220,6 @@ type EditorChangeTextRequest struct {
 	Talks      []DstTalk `json:"talks"`
 	DstTalks   []DstTalk `json:"dstTalks"`
 	ReferTalks []DstTalk `json:"referTalks"`
-	SourceTalks []SourceTalk `json:"sourceTalks"`
 }
 
 // EditorAddLineRequest adds a sub-line.
@@ -227,7 +228,6 @@ type EditorAddLineRequest struct {
 	Talks       []DstTalk  `json:"talks"`
 	DstTalks    []DstTalk  `json:"dstTalks"`
 	IsProofread bool       `json:"isProofreading"`
-	SourceTalks []SourceTalk `json:"sourceTalks"`
 }
 
 // EditorRemoveLineRequest removes a sub-line.
@@ -295,7 +295,6 @@ type FlashbackAnalyzeRequest struct {
 
 // FlashbackAnalyzeResponse contains flashback analysis results.
 type FlashbackAnalyzeResponse struct {
-	MajorClue string       `json:"majorClue"`
 	SourceTalks []SourceTalk `json:"sourceTalks"`
 }
 
@@ -347,18 +346,28 @@ type DownloadTaskProgress struct {
 
 // RecoveryData is the autosave recovery payload stored on disk.
 type RecoveryData struct {
-	Content    string `json:"content"`
-	FilePath   string `json:"filePath"`
-	EditorMode int    `json:"editorMode"`
-	SavedAt    string `json:"savedAt"`
+	Content      string `json:"content"`
+	FilePath     string `json:"filePath"`
+	EditorMode   int    `json:"editorMode"`
+	SavedAt      string `json:"savedAt"`
+	StoryType    string `json:"storyType,omitempty"`
+	StorySort    string `json:"storySort,omitempty"`
+	StoryIndex   string `json:"storyIndex,omitempty"`
+	StoryChapter int    `json:"storyChapter,omitempty"`
+	StorySource  string `json:"storySource,omitempty"`
 }
 
 // RecoverySaveRequest saves editor state for crash recovery.
 type RecoverySaveRequest struct {
-	Talks      []DstTalk `json:"talks"`
-	SaveN      bool      `json:"saveN"`
-	FilePath   string    `json:"filePath"`
-	EditorMode int       `json:"editorMode"`
+	Talks        []DstTalk `json:"talks"`
+	SaveN        bool      `json:"saveN"`
+	FilePath     string    `json:"filePath"`
+	EditorMode   int       `json:"editorMode"`
+	StoryType    string    `json:"storyType,omitempty"`
+	StorySort    string    `json:"storySort,omitempty"`
+	StoryIndex   string    `json:"storyIndex,omitempty"`
+	StoryChapter int       `json:"storyChapter,omitempty"`
+	StorySource  string    `json:"storySource,omitempty"`
 }
 
 // SaveMetadata is embedded in save files so the app can auto-navigate on open.

@@ -69,6 +69,14 @@ function saveAndBack() {
                 <option value="asc">升序（最新的在顶部）</option>
               </select>
             </div>
+
+            <label class="flex items-center justify-between cursor-pointer">
+              <div>
+                <div class="text-sm font-medium">切模式保留剧情</div>
+                <div class="text-xs text-[var(--color-text-secondary)] mt-0.5">切换翻/校/合时保留当前译文</div>
+              </div>
+              <input v-model="settings.settings.preserveStoryOnModeSwitch" type="checkbox" class="accent-[var(--color-primary)] w-4 h-4" />
+            </label>
           </div>
         </div>
       </section>

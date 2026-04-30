@@ -81,7 +81,7 @@ const showSpeakerCheck = ref(false)
 const sidebarOpen = ref(true)
 
 function setMode(key: number) {
-  editor.switchMode(key as 0 | 1 | 2)
+  editor.switchMode(key as 0 | 1 | 2, settings.settings.preserveStoryOnModeSwitch)
   app.setEditorMode(key as 0 | 1 | 2)
   if (key === 2) app.showDiff = true
 }

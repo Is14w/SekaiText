@@ -65,7 +65,7 @@ export const api = {
     ),
 
   jsonPath: (type: string, sort: string, index: string, chapter: number, source: string) =>
-    request<{ url: string; fileName: string }>(
+    request<{ url: string; fileName: string; saveTitle: string; chapterTitle: string }>(
       `/story/json-path?type=${encodeURIComponent(type)}&sort=${encodeURIComponent(sort)}&index=${encodeURIComponent(index)}&chapter=${chapter}&source=${encodeURIComponent(source)}`,
     ),
 
@@ -82,7 +82,7 @@ export const api = {
     ),
 
   storyLoadLocal: (content: string) =>
-    request<{ scenarioId: string; sourceTalks: import('../types/translation').SourceTalk[] }>(
+    request<{ scenarioId: string; sourceTalks: import('../types/translation').SourceTalk[]; saveTitle: string; chapterTitle: string }>(
       '/story/load-local',
       { method: 'POST', body: JSON.stringify({ content }) },
     ),
@@ -146,7 +146,6 @@ export const api = {
     talks: import('../types/translation').DstTalk[]
     dstTalks: import('../types/translation').DstTalk[]
     referTalks: import('../types/translation').DstTalk[]
-    sourceTalks: import('../types/translation').SourceTalk[]
   }) =>
     request<{ talks: import('../types/translation').DstTalk[]; dstTalks: import('../types/translation').DstTalk[] }>(
       '/editor/change-text',
@@ -158,7 +157,6 @@ export const api = {
     talks: import('../types/translation').DstTalk[]
     dstTalks: import('../types/translation').DstTalk[]
     isProofreading: boolean
-    sourceTalks: import('../types/translation').SourceTalk[]
   }) =>
     request<{ talks: import('../types/translation').DstTalk[]; dstTalks: import('../types/translation').DstTalk[] }>(
       '/editor/add-line',
@@ -202,15 +200,15 @@ export const api = {
 
   // Flashback
   flashbackAnalyze: (sourceTalks: import('../types/translation').SourceTalk[]) =>
-    request<{ majorClue: string; sourceTalks: import('../types/translation').SourceTalk[] }>(
+    request<{ sourceTalks: import('../types/translation').SourceTalk[] }>(
       '/flashback/analyze',
       { method: 'POST', body: JSON.stringify({ sourceTalks }) },
     ),
 
   clueHints: (clue: string, lang = 'zh-cn') =>
-    request<Record<string, string>>(`/flashback/clue-hints?clue=${encodeURIComponent(clue)}&lang=${encodeURIComponent(lang)}`),
+    request<{ clue: string; hints: string[] }>(`/flashback/clue-hints?clue=${encodeURIComponent(clue)}&lang=${encodeURIComponent(lang)}`),
 
-  voiceClues: () => request<Record<string, unknown>>('/flashback/voice-clues'),
+  voiceClues: () => request<Record<string, { id: number; title: string; name: string; chapters: { title: string }[]; cards: number[]; inferredVoiceIDs?: Record<string, unknown> }>>('/flashback/voice-clues'),
 
   // Voice
   voiceUrl: (scenarioId: string, voiceId: string, source: string) =>
@@ -234,6 +232,11 @@ export const api = {
     saveN: boolean
     filePath: string
     editorMode: number
+    storyType?: string
+    storySort?: string
+    storyIndex?: string
+    storyChapter?: number
+    storySource?: string
   }) =>
     request<{ status: string }>('/recovery/save', {
       method: 'POST',
@@ -247,6 +250,11 @@ export const api = {
       filePath?: string
       editorMode?: number
       savedAt?: string
+      storyType?: string
+      storySort?: string
+      storyIndex?: string
+      storyChapter?: number
+      storySource?: string
     }>('/recovery/load'),
 
   recoveryClear: () =>

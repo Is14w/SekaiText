@@ -12,6 +12,7 @@ export const useSettingsStore = defineStore('settings', () => {
     disableSSL: false,
     debugEnabled: false,
     jsonDownloadDir: './downloads/json',
+    preserveStoryOnModeSwitch: true,
 
     indexOrder: 'asc',
   })

@@ -122,23 +122,6 @@ func (h *Handler) StoryLoad(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, resp)
 }
 
-func (h *Handler) StoryParseLocal(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		FilePath string `json:"filePath"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-
-	resp, err := h.jsonLoader.ParseFile(req.FilePath)
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to parse file: "+err.Error())
-		return
-	}
-	writeJSON(w, http.StatusOK, resp)
-}
-
 func (h *Handler) StoryLoadLocal(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Content string `json:"content"`
@@ -258,7 +241,7 @@ func (h *Handler) ChangeText(w http.ResponseWriter, r *http.Request) {
 	}
 
 	talks, dstTalks := h.editor.ChangeText(req.Row, req.Text, req.EditorMode,
-		req.Talks, req.DstTalks, req.ReferTalks, req.SourceTalks)
+		req.Talks, req.DstTalks, req.ReferTalks)
 	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"talks":    talks,
 		"dstTalks": dstTalks,
@@ -640,10 +623,15 @@ func (h *Handler) RecoverySave(w http.ResponseWriter, r *http.Request) {
 
 	content := h.editor.SerializeContent(req.Talks, req.SaveN)
 	data := model.RecoveryData{
-		Content:    content,
-		FilePath:   req.FilePath,
-		EditorMode: req.EditorMode,
-		SavedAt:    time.Now().Format("2006-01-02 15:04:05"),
+		Content:      content,
+		FilePath:     req.FilePath,
+		EditorMode:   req.EditorMode,
+		SavedAt:      time.Now().Format("2006-01-02 15:04:05"),
+		StoryType:    req.StoryType,
+		StorySort:    req.StorySort,
+		StoryIndex:   req.StoryIndex,
+		StoryChapter: req.StoryChapter,
+		StorySource:  req.StorySource,
 	}
 
 	f, err := os.Create(h.recoveryPath())
@@ -671,11 +659,16 @@ func (h *Handler) RecoveryLoad(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, map[string]interface{}{
-		"exists":     true,
-		"content":    data.Content,
-		"filePath":   data.FilePath,
-		"editorMode": data.EditorMode,
-		"savedAt":    data.SavedAt,
+		"exists":       true,
+		"content":      data.Content,
+		"filePath":     data.FilePath,
+		"editorMode":   data.EditorMode,
+		"savedAt":      data.SavedAt,
+		"storyType":    data.StoryType,
+		"storySort":    data.StorySort,
+		"storyIndex":   data.StoryIndex,
+		"storyChapter": data.StoryChapter,
+		"storySource":  data.StorySource,
 	})
 }
 

@@ -21,6 +21,8 @@ export interface StoryChapter {
 export interface JsonPathResult {
   url: string
   fileName: string
+  saveTitle: string
+  chapterTitle: string
 }
 
 export interface LoadRequest {
@@ -34,4 +36,6 @@ export interface LoadRequest {
 export interface LoadResponse {
   scenarioId: string
   sourceTalks: SourceTalk[]
+  saveTitle: string
+  chapterTitle: string
 }

@@ -6,14 +6,17 @@ import { useEditorStore } from '../../stores/editor'
 import { api } from '../../api/client'
 import { useToast } from '../../composables/useToast'
 import VoicePlayButton from './VoicePlayButton.vue'
+import { useFlashbackTooltip } from '../../composables/useFlashbackTooltip'
 import type { DstTalk } from '../../types/translation'
 
 const iconErrors = ref<Set<number>>(new Set())
+const workspaceRef = ref<HTMLElement | null>(null)
 
 const app = useAppStore()
 const story = useStoryStore()
 const editor = useEditorStore()
 const toast = useToast()
+const { visible: fbVisible, tooltipStyle: fbStyle, clueGroups: fbClueGroups, show: fbShow, hide: fbHide } = useFlashbackTooltip()
 
 // ---- Flashback (from SourcePanel) ----
 const talksWithFlashback = computed(() => {
@@ -63,11 +66,6 @@ function flashbackItem(talk: DstTalk) {
 
 function srcTalkCharIndex(talk: DstTalk) {
   return srcTalk(talk)?.charIndex ?? -1
-}
-
-function flashbackClues(talk: DstTalk) {
-  const fb = flashbackItem(talk)
-  return fb?.isFlashback && fb?.clues ? fb.clues.filter((c: string) => c).join(', ') : undefined
 }
 
 // Group consecutive dest lines sharing the same source idx
@@ -126,7 +124,6 @@ async function handleTextChange(row: number, newText: string) {
         talks: editor.talks,
         dstTalks: editor.dstTalks,
         referTalks: editor.referTalks,
-        sourceTalks: editor.sourceTalks,
       })
       editor.setTalks(result.talks, result.dstTalks, editor.referTalks)
       editor.markUnsaved()
@@ -152,7 +149,6 @@ async function handleAddLine(row: number) {
       talks: editor.talks,
       dstTalks: editor.dstTalks,
       isProofreading: app.editorMode !== 0,
-      sourceTalks: editor.sourceTalks,
     })
     editor.setTalks(result.talks, result.dstTalks, editor.referTalks)
     editor.markUnsaved()
@@ -250,11 +246,37 @@ function handleContextMenu(e: MouseEvent, row: number) {
   const b = map[brackets.trim()]
   if (b) handleBracketsReplace(row, b)
 }
+
+function focusNext(e: KeyboardEvent) {
+  e.preventDefault()
+  const container = workspaceRef.value
+  if (!container) return
+  const editables = container.querySelectorAll<HTMLElement>('[contenteditable="true"]')
+  const idx = Array.from(editables).indexOf(e.target as HTMLElement)
+  const next = editables[idx + 1]
+  if (next) {
+    next.focus()
+    const range = document.createRange()
+    range.selectNodeContents(next)
+    range.collapse(false)
+    const sel = window.getSelection()
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+  }
+}
+
+function onSourceEnter(e: MouseEvent, talk: DstTalk) {
+  const fb = flashbackItem(talk)
+  if (fb?.isFlashback && fb?.clues) {
+    fbShow(e, fb.clues.filter((c: string) => !!c))
+  }
+}
 </script>
 
 <template>
   <div class="flex h-full">
     <div
+      ref="workspaceRef"
       class="flex-1 overflow-y-auto border border-[var(--color-border)] rounded-lg bg-[var(--color-surface)]"
     >
       <!-- Column headers -->
@@ -288,7 +310,8 @@ function handleContextMenu(e: MouseEvent, row: number) {
               <div
                 class="flex flex-col justify-center p-3 rounded-lg border border-[var(--color-border)] transition-colors"
                 :class="{ 'bg-[var(--color-flashback)]': flashbackItem(group.items[0].talk)?.isFlashback }"
-                :title="flashbackClues(group.items[0].talk) ? '闪回线索: ' + flashbackClues(group.items[0].talk) : undefined"
+                @mouseenter="onSourceEnter($event, group.items[0].talk)"
+                @mouseleave="fbHide()"
               >
                 <div class="flex items-center gap-3">
                   <div
@@ -361,6 +384,7 @@ function handleContextMenu(e: MouseEvent, row: number) {
                         style="font-size: var(--editor-font-size)"
                         :class="{ 'cursor-text': item.talk.save && ![''].includes(item.talk.speaker) }"
                         @blur="onBlur($event, item.globalIdx)"
+                        @keydown.enter.prevent="focusNext"
                         v-html="renderHighlight(item.talk)"
                       ></div>
                       <div v-if="item.talk.message" class="text-xs text-red-400 mt-0.5">
@@ -401,4 +425,28 @@ function handleContextMenu(e: MouseEvent, row: number) {
       </template>
     </div>
   </div>
+
+  <Teleport to="body">
+    <div
+      v-if="fbVisible && fbClueGroups.length > 0"
+      :style="fbStyle"
+      class="flashback-tooltip rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg p-3 text-xs pointer-events-none"
+    >
+      <div class="font-semibold text-[var(--color-primary)] mb-1.5">闪回来源</div>
+      <template v-for="(group, gi) in fbClueGroups" :key="gi">
+        <div
+          v-if="gi > 0"
+          class="border-t border-[var(--color-border)] my-1.5"
+        />
+        <div
+          v-for="(hint, hi) in group.hints"
+          :key="hi"
+          class="text-[var(--color-text-secondary)] leading-relaxed"
+          :class="hi === 0 ? 'font-medium' : 'text-xs opacity-80'"
+        >
+          {{ hint }}
+        </div>
+      </template>
+    </div>
+  </Teleport>
 </template>

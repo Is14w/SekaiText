@@ -12,6 +12,13 @@ struct SidecarProcess(Mutex<Option<Child>>);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+  let mut ctx = tauri::generate_context!();
+  ctx.set_default_window_icon(Some(
+    tauri::image::Image::from_bytes(
+      include_bytes!("../icons/icon.png"),
+    ).expect("Failed to load window icon"),
+  ));
+
   tauri::Builder::default()
     .plugin(tauri_plugin_dialog::init())
     .setup(|app| {
@@ -27,6 +34,8 @@ pub fn run() {
       if !cfg!(debug_assertions) {
         let resource_dir = app.path().resource_dir()
           .expect("failed to resolve resource directory");
+        let data_dir = app.path().app_local_data_dir()
+          .expect("failed to resolve app data directory");
 
         let exe_dir = std::env::current_exe()
           .expect("failed to get exe path")
@@ -40,7 +49,11 @@ pub fn run() {
         let sidecar_path = exe_dir.join("sekaitext-backend");
 
         let mut cmd = StdCommand::new(&sidecar_path);
-        cmd.args(["--port", "9800", "--dir", &resource_dir.to_string_lossy()]);
+        cmd.args([
+          "--port", "9800",
+          "--dir", &resource_dir.to_string_lossy(),
+          "--data-dir", &data_dir.to_string_lossy(),
+        ]);
 
         #[cfg(target_os = "windows")]
         cmd.creation_flags(CREATE_NO_WINDOW);
@@ -69,6 +82,6 @@ pub fn run() {
         }
       }
     })
-    .run(tauri::generate_context!())
+    .run(ctx)
     .expect("error while running tauri application");
 }

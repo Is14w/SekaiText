@@ -187,6 +187,15 @@ async function handleFullCheck() {
             class="accent-[var(--color-primary)] w-3.5 h-3.5"
           />
         </label>
+
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-[var(--color-text-secondary)]">切模式保留剧情</span>
+          <input
+            v-model="settings.settings.preserveStoryOnModeSwitch"
+            type="checkbox"
+            class="accent-[var(--color-primary)] w-3.5 h-3.5"
+          />
+        </label>
       </div>
 
       <!-- Collapsed: Settings button -->

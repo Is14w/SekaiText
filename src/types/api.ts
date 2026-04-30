@@ -10,6 +10,7 @@ export interface Settings {
   indexOrder: 'asc' | 'desc'
   voiceOutputDir?: string
   jsonDownloadDir?: string
+  preserveStoryOnModeSwitch: boolean
 
   lastStoryType?: string
   lastStorySort?: string
@@ -36,6 +37,8 @@ export interface LoadRequest {
 export interface LoadResponse {
   scenarioId: string
   sourceTalks: SourceTalk[]
+  saveTitle: string
+  chapterTitle: string
 }
 
 export interface TranslationCreateRequest {
@@ -51,6 +54,7 @@ export interface TranslationSaveRequest {
   filePath: string
   talks: DstTalk[]
   saveN: boolean
+  meta?: SaveMetadata
 }
 
 export interface CheckLinesRequest {
