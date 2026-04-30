@@ -27,7 +27,9 @@ dist-ssr
 .vscode/
 
 backend/downloads/
+backend/sekaitext.exe
+src-tauri/binaries/
 
-backend/resources/
+resources/
 
 scripts/

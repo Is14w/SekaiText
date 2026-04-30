@@ -1,6 +1,6 @@
 import { useDebugLog } from '../composables/useDebugLog'
 
-const BASE_URL = '/api/v1'
+const BASE_URL = 'http://localhost:9800/api/v1'
 
 const { log: debugLog } = useDebugLog()
 

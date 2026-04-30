@@ -197,6 +197,6 @@ func (d *Downloader) DownloadAndParseJSON(url, fileName string, target interface
 }
 
 // UpdateAll performs a full metadata update from CDN.
-func (lm *ListManager) UpdateAll(settingDir string, pt *ProgressTracker) {
-	lm.UpdateAllFromCDN(settingDir, pt)
+func (lm *ListManager) UpdateAll(catalogDir string, pt *ProgressTracker) {
+	lm.UpdateAllFromCDN(catalogDir, pt)
 }

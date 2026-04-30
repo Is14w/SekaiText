@@ -12,6 +12,19 @@
     "core:window:allow-maximize",
     "core:window:allow-unmaximize",
     "core:window:allow-is-maximized",
-    "dialog:default"
+    "dialog:default",
+    {
+      "identifier": "shell:allow-spawn",
+      "allow": [
+        {
+          "name": "sekaitext-backend",
+          "sidecar": true,
+          "args": true
+        }
+      ]
+    },
+    "shell:allow-execute",
+    "shell:allow-stdin-write",
+    "shell:allow-kill"
   ]
 }

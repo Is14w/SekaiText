@@ -21,9 +21,9 @@ type ListManager struct {
 	AreaTalks  []AreaTalkEntry
 	Greets     []GreetEntry
 	Specials   []SpecialEntry
-	Setting    map[string]interface{}
+	Catalog    map[string]interface{}
 
-	settingDir string
+	catalogDir string
 	DBurl      string
 
 	// For area talk navigation
@@ -131,10 +131,10 @@ type ChapterScenarioEntry struct {
 }
 
 // NewListManager creates and loads metadata from the setting directory.
-func NewListManager(settingDir string) *ListManager {
+func NewListManager(catalogDir string) *ListManager {
 	lm := &ListManager{
-		settingDir: settingDir,
-		Setting:    make(map[string]interface{}),
+		catalogDir: catalogDir,
+		Catalog:    make(map[string]interface{}),
 		baseUrls: map[string]string{
 			"best":    "https://storage.sekai.best/sekai-jp-assets/",
 			"uni":     "https://assets.unipjsk.com/",
@@ -142,27 +142,27 @@ func NewListManager(settingDir string) *ListManager {
 			"harukiJP": "https://sekai-assets-bdf29c81.seiunx.net/jp-assets/",
 		},
 	}
-	lm.loadSetting()
+	lm.loadCatalog()
 	lm.loadAll()
 	return lm
 }
 
-func (lm *ListManager) loadSetting() {
-	path := filepath.Join(lm.settingDir, "setting.json")
+func (lm *ListManager) loadCatalog() {
+	path := filepath.Join(lm.catalogDir, "setting.json")
 	data, err := os.ReadFile(path)
 	if err == nil {
-		json.Unmarshal(data, &lm.Setting)
+		json.Unmarshal(data, &lm.Catalog)
 	}
 }
 
 func (lm *ListManager) loadAll() {
-	lm.Events = loadJSONFile[[]EventEntry](lm.settingDir, "events.json")
-	lm.Festivals = loadJSONFile[[]FestivalEntry](lm.settingDir, "festivals.json")
-	lm.Cards = loadJSONFile[[]CardEntry](lm.settingDir, "cards.json")
-	lm.MainStory = loadJSONFile[[]MainStoryEntry](lm.settingDir, "mainStory.json")
-	lm.AreaTalks = loadJSONFile[[]AreaTalkEntry](lm.settingDir, "areatalks.json")
-	lm.Greets = loadJSONFile[[]GreetEntry](lm.settingDir, "greets.json")
-	lm.Specials = loadJSONFile[[]SpecialEntry](lm.settingDir, "specials.json")
+	lm.Events = loadJSONFile[[]EventEntry](lm.catalogDir, "events.json")
+	lm.Festivals = loadJSONFile[[]FestivalEntry](lm.catalogDir, "festivals.json")
+	lm.Cards = loadJSONFile[[]CardEntry](lm.catalogDir, "cards.json")
+	lm.MainStory = loadJSONFile[[]MainStoryEntry](lm.catalogDir, "mainStory.json")
+	lm.AreaTalks = loadJSONFile[[]AreaTalkEntry](lm.catalogDir, "areatalks.json")
+	lm.Greets = loadJSONFile[[]GreetEntry](lm.catalogDir, "greets.json")
+	lm.Specials = loadJSONFile[[]SpecialEntry](lm.catalogDir, "specials.json")
 	log.Println("All metadata loaded")
 }
 

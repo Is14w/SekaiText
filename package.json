@@ -1,16 +1,19 @@
 {
   "name": "sekaitext",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "node scripts/cleanup.mjs 5173 && vite",
     "dev:go": "node scripts/cleanup.mjs 9800 && cd backend && go run ./cmd/sekaitext/ --dir .",
     "dev:web": "concurrently --names go,vue --prefix-colors yellow,cyan \"npm run dev:go\" \"npm run dev\"",
     "dev:tauri": "npx tauri dev",
+    "build:go": "node scripts/build-go.mjs",
+    "build:all": "npm run build:go && npm run build",
     "build:tauri": "npx tauri build",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "version": "node scripts/sync-version.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.4",

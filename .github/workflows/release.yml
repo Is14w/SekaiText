@@ -21,12 +21,18 @@ jobs:
             target: x86_64-pc-windows-msvc
 
     runs-on: ${{ matrix.platform }}
+    env:
+      TAURI_TARGET: ${{ matrix.target }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -43,6 +49,10 @@ jobs:
         run: rustup target add aarch64-apple-darwin
 
       - run: npm ci
+
+      - name: Build Go backend sidecar
+        run: node scripts/build-go.mjs
+
       - run: npx tauri build --target ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v4

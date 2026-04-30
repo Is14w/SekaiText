@@ -24,7 +24,7 @@ func main() {
 	baseDir := *dir
 	if baseDir == "." {
 		// Check if CWD has resources/ directory
-		if _, err := os.Stat(filepath.Join(".", "resources", "setting")); os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(".", "resources", "catalog")); os.IsNotExist(err) {
 			// Fall back to executable directory for sidecar deployment
 			exe, err := os.Executable()
 			if err == nil {
@@ -36,7 +36,7 @@ func main() {
 	cfg := config.NewAppConfig(baseDir)
 
 	// Ensure resource directories exist
-	ensureDir(cfg.SettingDir)
+	ensureDir(cfg.CatalogDir)
 	ensureDir(cfg.DataDir)
 	ensureDir(cfg.ImagesChrDir)
 

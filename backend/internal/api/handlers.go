@@ -29,7 +29,7 @@ type Handler struct {
 
 // NewHandler creates a new Handler with all services initialized.
 func NewHandler(cfg *config.AppConfig, logBuf *service.LogBuffer) *Handler {
-	lm := service.NewListManager(cfg.SettingDir)
+	lm := service.NewListManager(cfg.CatalogDir)
 	fb := service.NewFlashbackAnalyzer(lm)
 	return &Handler{
 		cfg:        cfg,
@@ -445,7 +445,7 @@ func (h *Handler) SpeakerCount(w http.ResponseWriter, r *http.Request) {
 // --- Settings ---
 
 func (h *Handler) settingsPath() string {
-	return h.cfg.SettingDir + "/settings.json"
+	return h.cfg.CatalogDir + "/settings.json"
 }
 
 func (h *Handler) loadSettings() (model.Settings, error) {
@@ -461,7 +461,7 @@ func (h *Handler) loadSettings() (model.Settings, error) {
 }
 
 func (h *Handler) saveSettings(s model.Settings) error {
-	os.MkdirAll(h.cfg.SettingDir, 0755)
+	os.MkdirAll(h.cfg.CatalogDir, 0755)
 	data, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return err
@@ -493,7 +493,7 @@ func (h *Handler) PutSettings(w http.ResponseWriter, r *http.Request) {
 // --- Update ---
 
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
-	go h.lm.UpdateAll(h.cfg.SettingDir, h.progress)
+	go h.lm.UpdateAll(h.cfg.CatalogDir, h.progress)
 	writeJSON(w, http.StatusOK, map[string]string{"status": "started"})
 }
 
