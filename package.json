@@ -7,7 +7,7 @@
     "dev": "node scripts/cleanup.mjs 5173 && vite",
     "dev:go": "node scripts/cleanup.mjs 9800 && cd backend && go run ./cmd/sekaitext/ --dir .",
     "dev:web": "concurrently --names go,vue --prefix-colors yellow,cyan \"npm run dev:go\" \"npm run dev\"",
-    "dev:tauri": "npx tauri dev",
+    "dev:tauri": "node scripts/build-go.mjs && npx tauri dev",
     "build:go": "node scripts/build-go.mjs",
     "build:all": "npm run build:go && npm run build",
     "build:tauri": "npx tauri build",
@@ -19,7 +19,7 @@
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/vue-table": "^8.21.3",
     "@tanstack/vue-virtual": "^3.13.24",
-    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/api": "2.10.1",
     "@tauri-apps/plugin-dialog": "^2.7.0",
     "@vueuse/core": "^14.2.1",
     "lucide-vue-next": "^1.0.0",
@@ -30,7 +30,7 @@
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.10.1",
+    "@tauri-apps/cli": "2.10.1",
     "@types/node": "^24.12.2",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
