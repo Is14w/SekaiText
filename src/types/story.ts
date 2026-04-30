@@ -1,3 +1,5 @@
+import type { SourceTalk } from './translation'
+
 export type StoryType = 'event' | 'mainstory' | 'card' | 'festival' | 'areatalk' | 'greet' | 'special'
 
 export interface StorySort {

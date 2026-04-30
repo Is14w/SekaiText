@@ -19,7 +19,7 @@ async function handleRestore() {
       const { talks } = await api.translationLoadContent(result.content)
       editor.setTalks(talks, talks, [])
       if (result.filePath) editor.currentFilePath = result.filePath
-      if (result.editorMode != null) app.setEditorMode(result.editorMode)
+      if (result.editorMode != null) app.setEditorMode(result.editorMode as 0 | 1 | 2)
     }
   } catch {
     // Recovery failed, continue without it

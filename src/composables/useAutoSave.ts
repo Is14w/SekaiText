@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useEditorStore } from '../stores/editor'
 import { useAppStore } from '../stores/app'
 import { api } from '../api/client'

@@ -325,9 +325,9 @@ function handleContextMenu(e: MouseEvent, row: number) {
                   </div>
 
                   <VoicePlayButton
-                    v-if="srcTalk(group.items[0].talk)?.voices && srcTalk(group.items[0].talk)?.voices.length > 0"
+                    v-if="(srcTalk(group.items[0].talk)?.voices?.length ?? 0) > 0"
                     :scenario-id="story.scenarioId"
-                    :voice-ids="srcTalk(group.items[0].talk).voices"
+                    :voice-ids="(srcTalk(group.items[0].talk)?.voices ?? []) as string[]"
                     :volume="srcTalk(group.items[0].talk).volume"
                     :source="story.selectedSource"
                   />

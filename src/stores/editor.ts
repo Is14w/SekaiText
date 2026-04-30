@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, shallowRef } from 'vue'
+import { ref } from 'vue'
 import type { DstTalk, SourceTalk, EditorMode } from '../types/translation'
 
 interface ModeState {

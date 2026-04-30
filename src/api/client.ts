@@ -5,9 +5,11 @@ const BASE_URL = '/api/v1'
 const { log: debugLog } = useDebugLog()
 
 class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  status: number
+  constructor(status: number, message: string) {
     super(message)
     this.name = 'ApiError'
+    this.status = status
   }
 }
 
