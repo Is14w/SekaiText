@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { useLocalStorage, usePreferredDark } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
+
+export type ThemeMode = 'system' | 'light' | 'dark'
+
+const THEME_STORAGE_KEY = 'sekaitext-theme-mode'
 
 export const useAppStore = defineStore('app', () => {
   const fontSize = ref(18)
@@ -8,12 +13,15 @@ export const useAppStore = defineStore('app', () => {
   const syncScroll = ref(true)
   const showDiff = ref(false)
   const saveN = ref(true)
-  const isDark = ref(false)
+  const themeMode = useLocalStorage<ThemeMode>(THEME_STORAGE_KEY, 'system')
+  const isSystemDark = usePreferredDark()
+  const isDark = computed(() => themeMode.value === 'dark' || (themeMode.value === 'system' && isSystemDark.value))
 
-  function toggleTheme() {
-    isDark.value = !isDark.value
-    document.documentElement.classList.toggle('dark', isDark.value)
+  function applyTheme(dark: boolean) {
+    document.documentElement.classList.toggle('dark', dark)
   }
+
+  watch(isDark, applyTheme, { immediate: true })
 
   function setEditorMode(mode: 0 | 1 | 2) {
     editorMode.value = mode
@@ -26,8 +34,8 @@ export const useAppStore = defineStore('app', () => {
     syncScroll,
     showDiff,
     saveN,
+    themeMode,
     isDark,
-    toggleTheme,
     setEditorMode,
   }
 })

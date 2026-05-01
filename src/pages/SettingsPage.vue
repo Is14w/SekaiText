@@ -134,13 +134,20 @@ function saveAndBack() {
       <section class="mb-6">
         <h2 class="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3 px-1">外观</h2>
         <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6">
-          <label class="flex items-center justify-between cursor-pointer max-w-sm">
+          <div class="flex items-center justify-between max-w-sm">
             <div>
-              <div class="text-sm font-medium">暗色主题</div>
-              <div class="text-xs text-[var(--color-text-secondary)] mt-0.5">切换亮色/暗色显示</div>
+              <div class="text-sm font-medium">外观模式</div>
+              <div class="text-xs text-[var(--color-text-secondary)] mt-0.5">跟随系统或手动指定亮暗色</div>
             </div>
-            <input :checked="app.isDark" type="checkbox" class="accent-[var(--color-primary)] w-4 h-4" @change="app.toggleTheme()" />
-          </label>
+            <select
+              v-model="app.themeMode"
+              class="px-3 py-1.5 rounded border border-[var(--color-border)] bg-[var(--color-bg)] text-sm"
+            >
+              <option value="system">跟随系统</option>
+              <option value="light">浅色</option>
+              <option value="dark">深色</option>
+            </select>
+          </div>
         </div>
       </section>
 

@@ -169,15 +169,17 @@ async function handleFullCheck() {
           />
         </label>
 
-        <label class="flex items-center justify-between cursor-pointer">
-          <span class="text-[var(--color-text-secondary)]">暗色主题</span>
-          <input
-            :checked="app.isDark"
-            type="checkbox"
-            class="accent-[var(--color-primary)] w-3.5 h-3.5"
-            @change="app.toggleTheme()"
-          />
-        </label>
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[var(--color-text-secondary)]">外观</span>
+          <select
+            v-model="app.themeMode"
+            class="w-20 px-1.5 py-0.5 rounded border border-[var(--color-border)] bg-[var(--color-bg)] text-xs"
+          >
+            <option value="system">系统</option>
+            <option value="light">浅色</option>
+            <option value="dark">深色</option>
+          </select>
+        </div>
 
         <label class="flex items-center justify-between cursor-pointer">
           <span class="text-[var(--color-text-secondary)]">SSL 验证</span>
